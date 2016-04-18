@@ -1,0 +1,20 @@
+Log Watcher Daemon (logwatcherd)
+Copyright (C) 2016 Cedric Dufour <http://cedric.dufour.name>
+
+The Log Watcher Daemon (logwatcherd) is free software: you can redistribute
+it and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, Version 3.
+
+The Log Watcher Daemon (logwatcherd) is distributed in the hope that it will
+be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the GNU General Public License for more details.
+
+The Log Watcher Daemon (logwatcherd) includes all resources which contain
+the following mention in their preamble:
+"Log Watcher Daemon (logwatcherd)"
+
+Other resources are (and must be) used according to their original license,
+which is (should be made) available from their respective author.
+
