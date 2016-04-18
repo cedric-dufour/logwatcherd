@@ -1,0 +1,13 @@
+#!/bin/sh
+# INDENTING (emacs/vi): -*- mode:bash; tab-width:2; c-basic-offset:2; intent-tabs-mode:nil; -*- ex: set tabstop=2 expandtab smartindent shiftwidth=2:
+set -e
+
+# Compile python resources
+# NOTE: we implement our own 'python-support' in order to package Python 2.6
+#       even on platforms where it is deprecated   
+if which pycompile >/dev/null 2>&1; then
+  pycompile -p logwatcherd-python2.6
+fi
+
+exit 0
+

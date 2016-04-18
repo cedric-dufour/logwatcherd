@@ -1,0 +1,73 @@
+#! /bin/bash
+### BEGIN INIT INFO
+# Provides:          logwatcherd
+# Required-Start:    $syslog
+# Required-Stop:     $syslog
+# Should-Start:
+# Should-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start/Stop the Log Watcher Daemon (logwatcherd)
+### END INIT INFO
+
+# Parameters
+EXEC=/usr/bin/logwatcherd
+NAME=logwatcherd
+DESC='Log Watcher Daemon'
+DEFAULT=/etc/default/logwatcherd
+CONFIG=/etc/logwatcherd.conf
+PID=/var/run/logwatcherd.pid
+
+# Load resources
+. /lib/lsb/init-functions
+
+# Include defaults if available
+START=no
+[ -e "${DEFAULT}" ] && . "${DEFAULT}"
+[ "${START}" != 'yes' ] && echo "INFO: Daemon is disabled (in ${DEFAULT})" && exit 0
+
+# Check runtime environment
+[ ! -x "${EXEC}" ] && echo "ERROR: Missing/invalid executable (${EXEC})" >&2 && exit 1
+[ ! -r "${CONFIG}" ] && echo "ERROR: Missing/invalid configuration file (${CONFIG})" >&2 && exit 1
+
+# Main
+case "${1}" in
+
+    start)
+        log_daemon_msg "Starting ${DESC}" "${NAME}"
+        if start-stop-daemon --start --quiet --oknodo --pidfile "${PID}" --exec "${EXEC}" -- --config "${CONFIG}" --pid "${PID}"; then
+            log_end_msg 0
+        else
+            log_end_msg 1
+        fi
+        ;;
+
+    stop)
+        log_daemon_msg "Stopping ${DESC}" "${NAME}"
+        if start-stop-daemon --stop --quiet --oknodo --pidfile "${PID}"; then
+            log_end_msg 0
+        else
+            log_end_msg 1
+        fi
+        ;;
+
+    restart|force-reload)
+        $0 stop
+        sleep 10
+        $0 start
+        ;;
+
+    status)
+        status_of_proc -p "${PID}" "${EXEC}" "${NAME}" && exit 0 || exit $?
+        ;;
+
+    *)
+        log_failure_msg "USAGE: ${0} {start|stop|restart|force-reload|status}"
+        exit 1
+        ;;
+
+esac
+
+# Done
+exit 0
+

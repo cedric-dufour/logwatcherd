@@ -1,0 +1,63 @@
+Log Watcher Daemon (logwatcherd)
+================================
+
+
+BUILD
+-----
+
+NOTE: By "build", we mean create the necessary tarballs/package required for
+      installation (according to the INSTALL section below) or distribution.
+
+1. [MUST] Obtain the source code:
+
+   BASH: git clone https://github.com/cedric-dufour/logwatcherd
+
+   OR
+
+   BASH: tar -xjf logwatcherd-source-@version@.tar.bz2
+   BASH: cd logwatcherd-source-@version@
+
+2. [MAY] (Re-)build the source tarball:
+
+   BASH: ./debian/rules build-source-tarball
+   BASH: ls -al ../logwatcherd-source-@version@.tar.bz2
+
+3. [MAY] Build the installation (release) tarball:
+
+   BASH: ./debian/rules build-install-tarball
+   BASH: ls -al ../logwatcherd-@version@.tar.bz2
+
+4. [MAY] Build the debian packages:
+
+   BASH: debuild -us -uc -b
+   BASH: ls -al ../logwatcherd_@version@_all.deb ../logwatcherd-*_@version@_all.deb
+
+5. [MAY] Build the debian source package:
+
+   BASH: debuild -I'.git*' -I'*.pyc' -us -uc -S
+   BASH: ls -al ../logwatcherd_@version@.dsc ../logwatcherd_@version@.tar.gz
+
+OR
+
+2-5. [SHOULD] Do it all with a single command
+
+   BASH: ./debian/rules release
+
+
+INSTALL
+-------
+
+1. [MUST] Installation:
+
+   a. using the release tarball:
+
+      BASH: INSTALL_DIR='<installation-directory>'
+      BASH: cd "${INSTALL_DIR}"
+      BASH: tar -xjf logwatcherd-@version@.tar.bz2
+
+   OR
+
+   b. using the debian package:
+
+      BASH: dpkg -i logwatcherd_@version@_all.deb
+

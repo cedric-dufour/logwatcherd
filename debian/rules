@@ -1,0 +1,70 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+export PACKAGE = logwatcherd
+export VERSION := $(shell dpkg-parsechangelog | egrep '^Version:' | cut -f 2 -d ' ')
+
+# Required for 'help2man'
+export PYTHONPATH:=.:${PYTHONPATH}
+export PATH:=.:${PATH}
+
+%:
+	dh $@ --with python2 --buildsystem=pybuild
+
+override_dh_pysupport:
+	# NOTE: we implement our own 'python-support' in order to package Python 2.6
+	#       even on platforms where it is deprecated
+
+override_dh_install:
+	# Support given Python2 versions
+	debian/pyshared debian/tmp 2.6 2.7
+
+	# Fix global variables
+	sed -i "s|LOGWATCHER_VERSION\s*=.*|LOGWATCHER_VERSION = '$(VERSION)'|;s|LOGWATCHER_CONFIGSPEC\s*=.*|LOGWATCHER_CONFIGSPEC = '/usr/share/$(PACKAGE)/logwatcherd.conf.spec'|" debian/tmp/usr/share/pyshared/LogWatcher/__init__.py
+
+	# Install additional stuff
+	#mkdir -p debian/tmp/usr/bin
+	#cp logwatcherd debian/tmp/usr/bin/.
+	mkdir -p debian/tmp/usr/share/$(PACKAGE)
+	cp logwatcherd.conf.spec debian/tmp/usr/share/$(PACKAGE)/.
+	mkdir -p debian/tmp/etc
+	cp logwatcherd.conf.sample debian/tmp/etc/logwatcherd.conf
+
+	# Create man pages
+	mkdir -p debian/tmp/usr/share/man/man1
+	help2man \
+		--name 'Log Watcher Daemon (logwatcherd)' \
+		--help-option '--help' --version-string $(VERSION) --no-discard-stderr --no-info \
+		logwatcherd | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/logwatcherd.1
+
+	# Install
+	dh_install
+
+override_dh_installdocs:
+	dh_installdocs README EXAMPLE
+
+build-source-tarball:
+	dh_testdir
+	dh_clean build-stamp
+	# Create the source tarball
+	mkdir -p /tmp/$(PACKAGE)-source-$(VERSION)
+	cp -r * /tmp/$(PACKAGE)-source-$(VERSION)/.
+	tar -C /tmp -cjf ../$(PACKAGE)-source-$(VERSION).tar.bz2 $(PACKAGE)-source-$(VERSION)
+	rm -rf /tmp/$(PACKAGE)-source-$(VERSION)
+
+build-install-tarball:
+	# Create the installation tarball
+	# WARNING: make install before-hand!
+	mkdir -p /tmp/$(PACKAGE)-$(VERSION)/
+	cp -rp debian/tmp/usr debian/tmp/etc /tmp/$(PACKAGE)-$(VERSION)/.
+	tar -C /tmp -cjf ../$(PACKAGE)-$(VERSION).tar.bz2 $(PACKAGE)-$(VERSION)
+	rm -rf /tmp/$(PACKAGE)-$(VERSION)
+
+debian-packages:
+	debuild -us -uc -b
+
+debian-source:
+	debuild -I'.git*' -I'*.pyc' -us -uc -S
+
+release: debian-packages build-install-tarball debian-source build-source-tarball ;
+

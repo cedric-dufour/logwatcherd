@@ -1,0 +1,66 @@
+## GLOBAL CONFIGURATION
+[LogWatcher]
+
+# Enable debug messages (default: False)
+#debug = True|False
+
+
+## WATCHERS
+
+# A sample watcher
+#[SampleWatcher]
+
+# Whether to enable this watcher or not (default: True)
+#enable = True|False
+
+# Whether to output data filter matches (default: False)
+#verbose = True|False
+
+# Whether this watcher should be synchronous (default: True)
+# A synchronous watcher will silently block until its filters/consumers
+# are done with the producer data before continuing its business.
+# A non-synchronous watcher should have its blocking and timeout parameters
+# set appropriately (see below).
+# Note that each non-synchronous watcher comes with an additional "co-worker"
+# thread (thus resulting in two instead of one thread per watcher).
+#synchronous = True|False
+
+# Whether this (non-synchronous) watcher should be blocking (default: True)
+# A blocking watcher will verbosely wait until its filters/consumers
+# are done with the producer data before continuing its business.
+# A non-blocking watcher will verbosely discard new producer data as long
+# as its filters/consumers are not done with previous data fed to them.
+#blocking = True|False
+
+# Data feed timeout (default: 5.0 seconds)
+# How long a non-synchronous watcher should wait for its filters/consumers
+# to be done with the producer data.
+# On timeout, a blocking watcher will verbosely keep waiting;
+# a non-blocking watcher will move on and verbosely discard new data.
+#timeout = <float>
+
+# Producer plug-in and parameters.
+# A producer is responsible for producing data that may be useful.
+# There must be one producer per rule (and one only).
+# Paremeters must be specified using a URL(encoded) query string
+#producer = <producer-plugin>[?<argument>=<value>[&<argument>=<value>[&...]]]
+#producer = Tail?file=/var/log/auth.log
+
+# Filter plug-in(s) and parameters.
+# A filter is responsible for extracting meaningful data from the producer
+# and producing data usable by the consumers.
+# There can be zero to many filters per rule.
+# If no filter is defined, producer data are forwarded "as-is" to the
+# consumers (see below).
+# Paremeters must be specified using a URL(encoded) query string
+#filters = <filter-plugin>[?<argument>=<value>[&<argument>=<value>[&...]]]
+#filters = Grep?pattern=sshd.*Invalid user H from (%{ip})&ignorecase&group=1
+
+# Consumer plug-in(s) and parameters.
+# A consumer is responsible for taking proper action based on the data
+# provided to it (rule name, producer raw data and filter output data).
+# There must be at least one consumer per rule.
+# Paremeters must be specified using a URL(encoded) query string
+#consumers = <consumer-plugin>[?<argument>=<value>[&<argument>=<value>[&...]]]
+#consumers = Write?file=/proc/net/xt_recent/IPS_DROP, Mail?recipient=root@example.org
+

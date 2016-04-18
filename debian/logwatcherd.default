@@ -1,0 +1,3 @@
+# Uncomment the following line to allow the Log Watcher Daemon (logwatcherd)
+# to be started by the init.d script
+#START=yes

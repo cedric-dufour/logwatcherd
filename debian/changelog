@@ -1,0 +1,5 @@
+logwatcherd (2.0.20160418) UNRELEASED; urgency=low
+
+  * Initial release (Note: we start with version 2.x as in Python 2.x)
+
+ -- Cedric Dufour <cedric.dufour@ced-network.net>  Mon, 18 Apr 2016 15:31:50 +0200
