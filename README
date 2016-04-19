@@ -38,7 +38,7 @@ Watcher Daemon, thus allowing users to address even the most exotic use cases.
 With ad-hoc watchers, the Log Watcher Dameon can be made a simple Intrusion
 Detection System. Coupled with dynamic firewall configuration (e.g. along
 iptables 'recent' module), it can become a simple Intrusion Prevention System.
-Have a look a the EXAMPLE file for a short how-to.
+Have a look a the examples directory for a short how-to.
 
 On the other hand, the Log Watcher Daemon is not about performances and allowing
 to monitor a 10gb/s network link on a core routing host. Its goal is being
