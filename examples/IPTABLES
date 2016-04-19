@@ -26,8 +26,8 @@ with the LOGWATCHER_${ID} table being populated by the watcher by having its
 filters output IP addresses and a consumer writing these IP addresses to it,
 prefixed with the '+' symbol ('%2B' once URL encoded):
 
-  filters = Grep?pattern=.*(%{ip}).*&group=1
-  consumers = Write?file=/proc/net/xt_recent/LOGWATCHER_${ID}&truncate&prefix=%2B
+  filters = Grep?pattern=.*(%{ip}).*&group=1,
+  consumers = Write?file=/proc/net/xt_recent/LOGWATCHER_${ID}&truncate&prefix=%2B,
 
 
 While the entire framework ought to be enabled by jumping to the LOGWATCHER
