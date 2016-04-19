@@ -170,7 +170,7 @@ class Daemon:
             sys.stderr.write('ERROR[Daemon]: Invalid configuration data\n')
             for(lSectionList, sKey, _) in configobj.flatten_errors(self.__oConfigObj, oValidatorResult):
                 if sKey is not None:
-                    sys.stderr.write(' > Invalid value/pair (%s:%s)\n' % (', '.join(lSectionList), sKey))
+                    sys.stderr.write(' > Missing/invalid value/pair (%s:%s)\n' % (', '.join(lSectionList), sKey))
                 else:
                     sys.stderr.write(' > Missing/incomplete section (%s)\n' % ', '.join(lSectionList))
             return errno.EINVAL
@@ -208,46 +208,27 @@ class Daemon:
             dWatcherConfig_keys = list(dWatcherConfig.keys())
 
             # Enable ?
-            if 'enable' in dWatcherConfig_keys and not strtobool(dWatcherConfig['enable']):
+            if not dWatcherConfig['enable']:
                 if self.__bDebug:
                     sys.stderr.write('DEBUG[Daemon(%s)]: Watcher is disabled; skipping\n' % sWatcherName)
                 continue
 
             # Verbose ?
-            bVerbose = False
-            if 'verbose' in dWatcherConfig_keys:
-                bVerbose = strtobool(dWatcherConfig['verbose'])
+            bVerbose = dWatcherConfig['verbose']
 
             # Watcher
             oWatcher = Watcher(self, sWatcherName, bVerbose)
 
             # Synchronous
-            bSynchronous = True
-            if 'synchronous' in dWatcherConfig_keys:
-                 bSynchronous = strtobool(dWatcherConfig['synchronous'])
+            bSynchronous = dWatcherConfig['synchronous']
 
             # Blocking
-            bBlocking = True
-            if 'blocking' in dWatcherConfig_keys:
-                 bBlocking = strtobool(dWatcherConfig['blocking'])
+            bBlocking = dWatcherConfig['blocking']
 
             # Timeout
-            fTimeout = 5.0
-            if 'timeout' in dWatcherConfig_keys:
-                try:
-                    fTimeout = float(dWatcherConfig['timeout'])
-                    if fTimeout<0.0:
-                        raise ValueError('Value must me greater or equal to zero')
-                except ValueError:
-                    sys.stderr.write('ERROR[Daemon(%s)]: Invalid timeout value; using default\n' % sWatcherName)
+            fTimeout = dWatcherConfig['timeout']
 
             # Producer
-            if not 'producer' in dWatcherConfig_keys:
-                sys.stderr.write('ERROR[Daemon(%s)]: Watcher must define a producer\n' % sWatcherName)
-                continue
-            if not isinstance(dWatcherConfig['producer'], str):
-                sys.stderr.write('ERROR[Daemon(%s)]: Invalid producer definition\n' % sWatcherName)
-                continue
             dPluginConfig = urlparse.urlparse(dWatcherConfig['producer'])
             sPluginName = dPluginConfig.path
             try:
@@ -263,37 +244,27 @@ class Daemon:
                 continue
 
             # Filters
-            if 'filters' in dWatcherConfig_keys:
-                lPlugins = dWatcherConfig['filters']
-                if isinstance(lPlugins, str):
-                    lPlugins = [lPlugins]
-                try:
-                    for sPluginConfig in lPlugins:
-                        dPluginConfig = urlparse.urlparse(sPluginConfig)
-                        sPluginName = dPluginConfig.path
-                        try:
-                            oPluginClass = getattr(__import__('LogWatcher.Filters.%s' % sPluginName, fromlist=['LogWatcher.Filters']), sPluginName)
-                            oFilter = oPluginClass(oWatcher, dPluginConfig.query)
-                            oWatcher.addFilter(oFilter)
-                            if self.__bDebug:
-                                sys.stderr.write('DEBUG[Daemon(%s)]: Filter instantiated (%s)\n' % (sWatcherName, sPluginName))
-                        except Exception as e:
-                            sys.stderr.write('ERROR[Daemon(%s)]: Invalid filter (%s)\n%s\n' % (sWatcherName, sPluginName, str(e)))
-                            if self.__bDebug:
-                                traceback.print_exc()
-                            raise
-                except Exception:
-                    continue
+            try:
+                for sPluginConfig in dWatcherConfig['filters']:
+                    dPluginConfig = urlparse.urlparse(sPluginConfig)
+                    sPluginName = dPluginConfig.path
+                    try:
+                        oPluginClass = getattr(__import__('LogWatcher.Filters.%s' % sPluginName, fromlist=['LogWatcher.Filters']), sPluginName)
+                        oFilter = oPluginClass(oWatcher, dPluginConfig.query)
+                        oWatcher.addFilter(oFilter)
+                        if self.__bDebug:
+                            sys.stderr.write('DEBUG[Daemon(%s)]: Filter instantiated (%s)\n' % (sWatcherName, sPluginName))
+                    except Exception as e:
+                        sys.stderr.write('ERROR[Daemon(%s)]: Invalid filter (%s)\n%s\n' % (sWatcherName, sPluginName, str(e)))
+                        if self.__bDebug:
+                            traceback.print_exc()
+                        raise
+            except Exception:
+                continue
 
             # Consumers
-            if not 'consumers' in dWatcherConfig_keys:
-                sys.stderr.write('ERROR[Daemon(%s)]: Watcher must define at least one consumer\n' % sWatcherName)
-                continue
-            lPlugins = dWatcherConfig['consumers']
-            if isinstance(lPlugins, str):
-                lPlugins = [lPlugins]
             try:
-                for sPluginConfig in lPlugins:
+                for sPluginConfig in dWatcherConfig['consumers']:
                     dPluginConfig = urlparse.urlparse(sPluginConfig)
                     sPluginName = dPluginConfig.path
                     try:
