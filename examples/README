@@ -1,0 +1,12 @@
+Log Watcher Daemon (logwatcherd) - Configuration examples
+=========================================================
+
+This directory contains configuration examples for common and well-known
+services.
+
+Please fill free to contribute to those examples by requesting pull-requests
+on https://github.com/cedric-dufour/logwatcherd
+
+Also make sure to go through the associated IPTABLES file, which provides
+an ad-hoc iptables framework for those examples.
+

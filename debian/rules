@@ -41,7 +41,7 @@ override_dh_install:
 	dh_install
 
 override_dh_installdocs:
-	dh_installdocs README EXAMPLE
+	dh_installdocs README examples
 
 build-source-tarball:
 	dh_testdir

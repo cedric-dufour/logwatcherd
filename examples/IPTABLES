@@ -1,0 +1,76 @@
+Log Watcher Daemon (logwatcherd) - Iptables examples
+====================================================
+
+Below are sample iptables rules to go along the Log Watcher Daemon and its
+configuration examples.
+
+Those examples will make use of iptables 'recent' module, which (according to
+'man iptables-extensions'):
+
+ "Allows you to dynamically create a list of IP addresses and then match
+  against that list in a few different ways. For example, you can create
+  a "badguy" list out of people attempting to connect to port 139 on your
+  firewall and then DROP all future packets from them without considering
+  them."
+
+
+Watcher-specific rules ought to be inserted in the LOGWATCHER_RULES chain:
+
+  # Watcher-specific rule (${ID})
+  iptables --table filter \
+           --insert LOGWATCHER_RULES \
+           --match recent --name LOGWATCHER_${ID} --rcheck --seconds ${TTL} --hitcount ${HITS} --reap \
+           --jump LOGWATCHER_{DROP|BL1H|BL24H}
+
+with the LOGWATCHER_${ID} table being populated by the watcher by having its
+filters output IP addresses and a consumer writing these IP addresses to it,
+prefixed with the '+' symbol ('%2B' once URL encoded):
+
+  filters = Grep?pattern=.*(%{ip}).*&group=1
+  consumers = Write?file=/proc/net/xt_recent/LOGWATCHER_${ID}&truncate&prefix=%2B
+
+
+While the entire framework ought to be enabled by jumping to the LOGWATCHER
+chain at the appropriate position in the INPUT (or FORWARD) chain:
+
+  # Stateful firewall
+  iptables --table filter --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
+  iptables --table filter --append INPUT --match state --state INVALID --jump DROP
+
+  # Enable the Log Watcher Daemon framework
+  iptables --table filter --append INPUT --jump LOGWATCHER
+
+
+Finally, the framework itself:
+
+  ## Log Watcher Daemon chains
+
+  # Logging
+  iptables --table filter --new-chain LOGWATCHER_DROP
+  iptables --table filter --append LOGWATCHER_DROP --match recent --name LOGWATCHER_DROP --rcheck --seconds 3600 --jump DROP
+  iptables --table filter --append LOGWATCHER_DROP --jump LOG --log-level warning --log-prefix '[IPTABLES:LOGWATCHER_DROP] '
+  iptables --table filter --append LOGWATCHER_DROP --match recent --name LOGWATCHER_DROP --set --jump DROP
+
+  # Blacklists
+  # ... 24h
+  iptables --table filter --new-chain LOGWATCHER_BL24H
+  iptables --table filter --append LOGWATCHER_BL24H --match recent --name LOGWATCHER_BL24H --set --jump LOGWATCHER_DROP
+  # ... 1h
+  iptables --table filter --new-chain LOGWATCHER_BL1H
+  iptables --table filter --append LOGWATCHER_BL1H --match recent --name LOGWATCHER_BL1H --set --jump LOGWATCHER_DROP
+
+  # User rules
+  iptables --table filter --new-chain LOGWATCHER_RULES
+  # ... (return)
+  iptables --table filter --append LOGWATCHER_RULES --jump RETURN
+
+  # Main chain / framework entry point
+  iptables --table filter --new-chain LOGWATCHER
+  # ... blacklists
+  iptables --table filter --append LOGWATCHER --match recent --name LOGWATCHER_BL24H --rcheck --seconds 86400 --reap --jump LOGWATCHER_DROP
+  iptables --table filter --append LOGWATCHER --match recent --name LOGWATCHER_BL1H --rcheck --seconds 3600 --reap --jump LOGWATCHER_DROP
+  # ... user rules
+  iptables --table filter --append LOGWATCHER --jump LOGWATCHER_RULES
+  # ... (return)
+  iptables --table filter --append LOGWATCHER --jump RETURN
+
