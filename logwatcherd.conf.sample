@@ -4,6 +4,10 @@
 # Enable debug messages.
 #debug = boolean(default=False)
 
+# Wait the given amount of seconds at startup.
+# (wait for potential dependencies to be initialized)
+#delay = integer(min=0, max=300, default=0)
+
 
 ## WATCHERS
 

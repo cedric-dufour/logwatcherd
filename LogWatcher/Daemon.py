@@ -199,6 +199,13 @@ class Daemon:
         Create threads corresponding to each configured watcher; returns a non-zero exit code in case of failure.
         """
 
+        # Delay
+        if _oConfigObj['LogWatcher']['delay']>0:
+            if self.__bDebug:
+                sys.stderr.write('DEBUG[Daemon]: Waiting %d seconds before start...\n' % _oConfigObj['LogWatcher']['delay'])
+            time.sleep(_oConfigObj['LogWatcher']['delay'])
+            if self.__bStop: return
+
         # Loop through configured watchers (<=> sections)
         for sWatcherName in list(_oConfigObj.keys()):
             if sWatcherName=='LogWatcher':

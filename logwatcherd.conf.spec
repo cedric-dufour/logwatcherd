@@ -1,5 +1,6 @@
 [LogWatcher]
 debug = boolean(default=False)
+delay = integer(min=0, max=300, default=0)
 
 [__many__]
 enable = boolean(default=True)
