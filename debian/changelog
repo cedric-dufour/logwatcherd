@@ -1,3 +1,13 @@
+logwatcherd (2.0.20160419a) UNRELEASED; urgency=low
+
+  * New release
+  - DOC: New 'examples' directory
+  - MOD: (Pre-)validate the entire configuration (watchers included)
+  - ADD: Global 'delay' configuration parameter
+  - FIX: Correct examples according to the (new) configuration specification
+
+ -- Cedric Dufour <cedric.dufour@ced-network.net>  Tue, 19 Apr 2016 12:03:01 +0200
+
 logwatcherd (2.0.20160418) UNRELEASED; urgency=low
 
   * Initial release (Note: we start with version 2.x as in Python 2.x)
