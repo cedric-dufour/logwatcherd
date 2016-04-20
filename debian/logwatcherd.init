@@ -45,7 +45,18 @@ case "${1}" in
     stop)
         log_daemon_msg "Stopping ${DESC}" "${NAME}"
         if start-stop-daemon --stop --quiet --oknodo --pidfile "${PID}"; then
-            log_end_msg 0
+            n=10; while true; do
+                let n=n-1
+                if [ ${n} -le 0 ]; then
+                    log_end_msg 1
+                    break
+                fi
+                if [ ! -e "${PID}" ]; then
+                    log_end_msg 0
+                    break
+                fi
+                sleep 1
+            done
         else
             log_end_msg 1
         fi
@@ -53,7 +64,6 @@ case "${1}" in
 
     restart|force-reload)
         $0 stop
-        sleep 10
         $0 start
         ;;
 
