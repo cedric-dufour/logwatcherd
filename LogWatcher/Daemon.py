@@ -375,7 +375,7 @@ class Daemon:
                     if iThreadsActive>1:
                         if self.__bDebug:
                             sys.stderr.write('DEBUG[Daemon]: Stopping / Waiting for %d threads to terminate\n' % (iThreadsActive-1))
-                        time.sleep(5)
+                        time.sleep(1)
                     else:
                         break
                 break
