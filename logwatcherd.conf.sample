@@ -24,6 +24,9 @@ includes = /etc/logwatcherd.d/*.conf,
 # Whether to output data filter matches.
 #verbose = boolean(default=False)
 
+# Whether to respawn this watcher in case of error.
+#respawn = boolean(default=False)
+
 # Whether this watcher should be synchronous.
 # A synchronous watcher will silently block until its filters/consumers
 # are done with the producer data before continuing its business.

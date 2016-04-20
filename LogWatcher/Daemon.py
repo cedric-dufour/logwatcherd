@@ -260,8 +260,11 @@ class Daemon:
             # Verbose ?
             bVerbose = dWatcherConfig['verbose']
 
+            # Respawn ?
+            bRespawn = dWatcherConfig['respawn']
+
             # Watcher
-            oWatcher = Watcher(self, sWatcherName, bVerbose)
+            oWatcher = Watcher(self, sWatcherName, bVerbose, bRespawn)
 
             # Synchronous
             bSynchronous = dWatcherConfig['synchronous']

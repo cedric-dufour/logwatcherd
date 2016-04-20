@@ -59,13 +59,14 @@ class Watcher:
     # CONSTRUCTORS / DESTRUCTOR
     #------------------------------------------------------------------------------
 
-    def __init__(self, _oDaemon, _sName, _bVerbose):
+    def __init__(self, _oDaemon, _sName, _bVerbose, _bRespawn):
         """
         Constructor.
 
         @param  Daemon  _oDameon   Parent daemon
         @param  string  _sName     Watcher name
         @param  bool    _bVerbose  Log output data
+        @param  bool    _bRespawn  Respawn watcher in case of error
         """
 
         # Fields
@@ -73,6 +74,7 @@ class Watcher:
         self.__oDaemon = _oDaemon
         self.__sName = _sName
         self.__bVerbose = _bVerbose
+        self.__bRespawn = _bRespawn
         self.__oProducer = None
         self.__bFilter = False
         self.__loFilters = []
@@ -183,10 +185,14 @@ class Watcher:
                 try:
                     oData = oFilter.feed(_sData)
                 except Exception as e:
-                    self.__oDaemon.log('ERROR[Watcher(%s)]: Filter error; exiting\n%s\n' % (self.__sName, str(e)))
+                    self.__oDaemon.log('ERROR[Watcher(%s)]: Filter error\n%s\n' % (self.__sName, str(e)))
                     if self.__bDebug:
                         traceback.print_exc()
-                    self.stop()
+                    if self.__bRespawn:
+                        self.__oDaemon.log('INFO[Watcher(%s)]: Respawning\n' % self.__sName)
+                    else:
+                        self.__oDaemon.log('ERROR[Watcher(%s)]: Exiting\n' % self.__sName)
+                        self.stop()
                     return
                 if oData is not None:
                     break
@@ -203,10 +209,14 @@ class Watcher:
                 try:
                     oData = oConditioner.feed(oData)
                 except Exception as e:
-                    self.__oDaemon.log('ERROR[Watcher(%s)]: Conditioner error; exiting\n%s\n' % (self.__sName, str(e)))
+                    self.__oDaemon.log('ERROR[Watcher(%s)]: Conditioner error\n%s\n' % (self.__sName, str(e)))
                     if self.__bDebug:
                         traceback.print_exc()
-                    self.stop()
+                    if self.__bRespawn:
+                        self.__oDaemon.log('INFO[Watcher(%s)]: Respawning\n' % self.__sName)
+                    else:
+                        self.__oDaemon.log('ERROR[Watcher(%s)]: Exiting\n' % self.__sName)
+                        self.stop()
                     return
                 if oData is None:
                     return
@@ -220,10 +230,14 @@ class Watcher:
             try:
                 oConsumer.feed(oData)
             except Exception as e:
-                self.__oDaemon.log('ERROR[Watcher(%s)]: Consumer error; exiting\n%s\n' % (self.__sName, str(e)))
+                self.__oDaemon.log('ERROR[Watcher(%s)]: Consumer error\n%s\n' % (self.__sName, str(e)))
                 if self.__bDebug:
                     traceback.print_exc()
-                self.stop()
+                if self.__bRespawn:
+                    self.__oDaemon.log('INFO[Watcher(%s)]: Respawning\n' % self.__sName)
+                else:
+                    self.__oDaemon.log('ERROR[Watcher(%s)]: Exiting\n' % self.__sName)
+                    self.stop()
                 return
 
 
@@ -242,15 +256,23 @@ class Watcher:
             raise RuntimeError('Watcher has no Consumer')
 
         # Run the producer
-        try:
-            self.__oProducer.run()
-        except Exception as e:
-            self.__oDaemon.log('ERROR[Watcher(%s)]: Producer error\n%s\n' % (self.__sName, str(e)))
-            if self.__bDebug:
-                traceback.print_exc()
-        if not self.__bStop:
-            self.__oDaemon.log('ERROR[Watcher(%s)]: Producer terminated abnormaly; exiting\n' % self.__sName)
-        self.stop()
+        while True:
+            if self.__bStop: break
+            try:
+                self.__oProducer.run()
+                if not self.__bStop:
+                    self.__oDaemon.log('ERROR[Watcher(%s)]: Producer terminated without being stopped\n' % self.__sName)
+            except Exception as e:
+                self.__oDaemon.log('ERROR[Watcher(%s)]: Producer error\n%s\n' % (self.__sName, str(e)))
+                if self.__bDebug:
+                    traceback.print_exc()
+            if not self.__bStop:
+                if self.__bRespawn:
+                    self.__oDaemon.log('INFO[Watcher(%s)]: Respawning\n' % self.__sName)
+                    continue
+                else:
+                    self.__oDaemon.log('ERROR[Watcher(%s)]: Exiting\n' % self.__sName)
+            self.stop()
 
 
     def stop(self):
