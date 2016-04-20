@@ -25,8 +25,10 @@
 from distutils.util import \
      strtobool
 import errno
-import signal
+import glob
 import os
+import os.path
+import signal
 import sys
 import syslog
 import threading
@@ -157,13 +159,48 @@ class Daemon:
             self.__oConfigObj = configobj.ConfigObj(
                 self.__oArguments.config,
                 configspec=LOGWATCHER_CONFIGSPEC,
-                file_error=True)
+                file_error=True
+            )
         except Exception as e:
             self.__oConfigObj = None
             sys.stderr.write('ERROR[Daemon]: Failed to load configuration from file; %s\n' % str(e))
             return errno.ENOENT
 
-        # ... and validate it
+        # ... pre-validation (NB: we do this in order to include incomplete configuration files/snippets)
+        bDebug = False
+        lsIncludeGlobs = []
+        if 'LogWatcher' in self.__oConfigObj.keys():
+            if 'debug' in self.__oConfigObj['LogWatcher'].keys():
+                try:
+                    bDebug = strtobool(self.__oConfigObj['LogWatcher']['debug'])
+                except ValueError:
+                    pass
+            if 'includes' in self.__oConfigObj['LogWatcher'].keys():
+                lsIncludeGlobs = self.__oConfigObj['LogWatcher']['includes']
+
+        # ... includes
+        for sIncludeGlob in lsIncludeGlobs:
+            if not len(sIncludeGlob): continue
+            if sIncludeGlob[0]!='/':
+                sIncludeGlob = '%s/%s' % (os.path.dirname(self.__oArguments.config), sIncludeGlob)
+            if bDebug:
+                sys.stderr.write('DEBUG[Daemon]: Looking for configuration files matching \'%s\'\n' % sIncludeGlob)
+            for sIncludeFile in sorted(glob.glob(sIncludeGlob)):
+                try:
+                    oConfigObj = configobj.ConfigObj(
+                        sIncludeFile,
+                        configspec=LOGWATCHER_CONFIGSPEC,
+                        file_error=True
+                    )
+                    self.__oConfigObj.merge(oConfigObj)
+                    if bDebug:
+                        sys.stderr.write('DEBUG[Daemon]: Included configuration from \'%s\'\n' % sIncludeFile)
+                except Exception as e:
+                    self.__oConfigObj = None
+                    sys.stderr.write('ERROR[Daemon]: Failed to include configuration from \'%s\'; %s\n' % (sIncludeFile, str(e)))
+                    return errno.ENOENT
+
+        # ... validation
         oValidator = validate.Validator()
         oValidatorResult = self.__oConfigObj.validate(oValidator)
         if oValidatorResult != True:

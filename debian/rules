@@ -27,7 +27,7 @@ override_dh_install:
 	#cp logwatcherd debian/tmp/usr/bin/.
 	mkdir -p debian/tmp/usr/share/$(PACKAGE)
 	cp logwatcherd.conf.spec debian/tmp/usr/share/$(PACKAGE)/.
-	mkdir -p debian/tmp/etc
+	mkdir -p debian/tmp/etc/logwatcherd.d
 	cp logwatcherd.conf.sample debian/tmp/etc/logwatcherd.conf
 
 	# Create man pages

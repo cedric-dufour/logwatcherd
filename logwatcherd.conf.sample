@@ -8,6 +8,10 @@
 # (wait for potential dependencies to be initialized)
 #delay = integer(min=0, max=300, default=0)
 
+# Includes files matching the given glob(s)
+#includes = string_list(min=0, default=list())
+includes = /etc/logwatcherd.d/*.conf,
+
 
 ## WATCHERS
 
