@@ -1,3 +1,16 @@
+logwatcherd (2.0.20160420a) UNRELEASED; urgency=low
+
+  * New release
+  - FIX: Minor correction in README file
+  - ADD: Data 'Conditioners'
+  - ADD: Allow to include configuration files
+  - MOD: Allow daemon to exit faster when interrupted
+  - FIX: Wait for daemon to stop in init script (and be systemd friendly)
+  - ADD: New 'respawn' configuration parameter allows watcher to respawn        
+         in case of error
+
+ -- Cedric Dufour <cedric.dufour@ced-network.net>  Wed, 20 Apr 2016 16:00:44 +0200
+
 logwatcherd (2.0.20160419a) UNRELEASED; urgency=low
 
   * New release
