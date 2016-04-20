@@ -29,6 +29,7 @@ import traceback
 from .Data import Data
 from .Producers import Producer
 from .Filters import Filter
+from .Conditioners import Conditioner
 from .Consumers import Consumer
 
 
@@ -49,7 +50,9 @@ class Watcher:
     output back to it.
     Each output is then fed to the configured filters, each in turn.
     The first matching filter will then return a fully populated data object.
-    That data object is then fed to the consumers.
+    That data object is then fed to the conditioners, each in turn.
+    If a conditioner returns no data (None), further processing is interrupted.
+    Otherwise, the resulting data object is eventually fed to the consumers.
     """
 
     #------------------------------------------------------------------------------
@@ -62,7 +65,7 @@ class Watcher:
 
         @param  Daemon  _oDameon   Parent daemon
         @param  string  _sName     Watcher name
-        @param  bool    _bVerbose  Log filtered (output) data
+        @param  bool    _bVerbose  Log output data
         """
 
         # Fields
@@ -73,6 +76,8 @@ class Watcher:
         self.__oProducer = None
         self.__bFilter = False
         self.__loFilters = []
+        self.__bConditioner = False
+        self.__loConditioners = []
         self.__loConsumers = []
         self.__bStop = False
         self.__bDebug = _oDaemon.debug()
@@ -101,6 +106,19 @@ class Watcher:
             raise RuntimeError('Filter is not a subclass of LogWatcher.Filters.Filter')
         self.__bFilter = True
         self.__loFilters.append(_oFilter)
+
+
+    def addConditioner(self, _oConditioner):
+        """
+        Add a data conditioner.
+
+        @param  Conditioner  _oConditioner  Log data conditioner
+        """
+
+        if not isinstance(_oConditioner, Conditioner):
+            raise RuntimeError('Conditioner is not a subclass of LogWatcher.Conditioners.Conditioner')
+        self.__bConditioner = True
+        self.__loConditioners.append(_oConditioner)
 
 
     def addConsumer(self, _oConsumer):
@@ -155,10 +173,10 @@ class Watcher:
 
         # Stop ?
         if self.__bStop: return
-
-        # Feed the data (string) to the filters (if any)
         if self.__bDebug:
             self.__oDaemon.log('DEBUG[Watcher(%s)]: Produced data\n%s\n' % (self.__sName, _sData))
+
+        # Feed the data (string) to the filters (if any)
         oData = None
         if self.__bFilter:
             for oFilter in self.__loFilters:
@@ -176,12 +194,28 @@ class Watcher:
                 return
         else:
             oData = Data(self.__sName, _sData, _sData)
-        if self.__bVerbose:
-            self.__oDaemon.log('INFO[Watcher(%s)]: Data: %s\n' % (self.__sName, oData.data))
-        elif self.__bDebug:
+        if self.__bDebug:
             self.__oDaemon.log('DEBUG[Watcher(%s)]: Filtered data\n%s\n' % (self.__sName, oData.data))
 
+        # Feed the data (object) to the conditioners (if any)
+        if self.__bConditioner:
+            for oConditioner in self.__loConditioners:
+                try:
+                    oData = oConditioner.feed(oData)
+                except Exception as e:
+                    self.__oDaemon.log('ERROR[Watcher(%s)]: Conditioner error; exiting\n%s\n' % (self.__sName, str(e)))
+                    if self.__bDebug:
+                        traceback.print_exc()
+                    self.stop()
+                    return
+                if oData is None:
+                    return
+            if self.__bDebug:
+                self.__oDaemon.log('DEBUG[Watcher(%s)]: Conditioned data\n%s\n' % (self.__sName, oData.data))
+
         # Feed the data (object) to the consumers
+        if self.__bVerbose:
+            self.__oDaemon.log('INFO[Watcher(%s)]: Data: %s\n' % (self.__sName, oData.data))
         for oConsumer in self.__loConsumers:
             try:
                 oConsumer.feed(oData)

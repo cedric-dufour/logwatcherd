@@ -269,6 +269,25 @@ class Daemon:
             except Exception:
                 continue
 
+            # Conditioners
+            try:
+                for sPluginConfig in dWatcherConfig['conditioners']:
+                    dPluginConfig = urlparse.urlparse(sPluginConfig)
+                    sPluginName = dPluginConfig.path
+                    try:
+                        oPluginClass = getattr(__import__('LogWatcher.Conditioners.%s' % sPluginName, fromlist=['LogWatcher.Conditioners']), sPluginName)
+                        oConditioner = oPluginClass(oWatcher, dPluginConfig.query)
+                        oWatcher.addConditioner(oConditioner)
+                        if self.__bDebug:
+                            sys.stderr.write('DEBUG[Daemon(%s)]: Conditioner instantiated (%s)\n' % (sWatcherName, sPluginName))
+                    except Exception as e:
+                        sys.stderr.write('ERROR[Daemon(%s)]: Invalid conditioner (%s)\n%s\n' % (sWatcherName, sPluginName, str(e)))
+                        if self.__bDebug:
+                            traceback.print_exc()
+                        raise
+            except Exception:
+                continue
+
             # Consumers
             try:
                 for sPluginConfig in dWatcherConfig['consumers']:

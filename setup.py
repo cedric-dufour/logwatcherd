@@ -24,11 +24,13 @@ Each watcher consists of:
    e.g. watching the content of a log file
  - zero-to-many "Filter(s)", which extract meaningful data from the producer;
    e.g. looking for failed login attempts
+ - zero-to-many "Conditioner(s)", which further filter or modify the data;
+   e.g. excluding IP addresses from the LAN
  - one-to-many "Consumer(s)", which take actions based on that data
    e.g. add an IP address to an iptables blacklist
 
-Producers, filters and consumers are all plugins. A set of basic plugins are
-provided as part of the Log Watcher Daemon codebase:
+Producers, filters, conditioners and consumers are all plugins. A set of basic
+plugins are provided as part of the Log Watcher Daemon codebase:
 
 Producer plugins:
  - "Read": dump the content of a given file (cat ...)
@@ -37,6 +39,9 @@ Producer plugins:
 Filter plugins:
  - "Grep": match data based on a given regular expression
  - "Awk": match data field based on a given regular expression
+
+Conditioner plugins:
+ - "Sed": match (and replace) data based on a given regular expression
 
 Consumer plugins:
  - "Write": write or append data to a given file
@@ -62,7 +67,7 @@ provides some service (e.g. a virtual machine providing SSH remote access).
     license = 'GPL-3',
     url = 'https://github.com/cedric-dufour/logwatcherd',
     download_url = 'https://github.com/cedric-dufour/logwatcherd',
-    packages = [ 'LogWatcher', 'LogWatcher.Producers', 'LogWatcher.Filters', 'LogWatcher.Consumers' ],
+    packages = [ 'LogWatcher', 'LogWatcher.Producers', 'LogWatcher.Filters', 'LogWatcher.Conditioners', 'LogWatcher.Consumers' ],
     requires = [ 'argparse', 'configobj', 'daemon' ],
     scripts = [ 'logwatcherd' ],
     )
