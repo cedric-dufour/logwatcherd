@@ -53,7 +53,7 @@ includes = /etc/logwatcherd.d/*.conf,
 # Producer plug-in and parameters.
 # A producer is responsible for producing data that may be useful.
 # There must be one producer per watcher (and one only).
-# Paremeters must be specified using a URL(encoded) query string
+# Parameters must be specified using a URL(encoded) query string
 #producer = string(min=1)
 #producer = <producer-plugin>[?<argument>=<value>[&<argument>=<value>[&...]]]
 #producer = Tail?file=/var/log/auth.log
@@ -63,7 +63,7 @@ includes = /etc/logwatcherd.d/*.conf,
 # and producing data usable by the consumers.
 # There can be zero to many filters per watcher.
 # If no filter is defined, producer data are forwarded "as-is".
-# Paremeters must be specified using a URL(encoded) query string
+# Parameters must be specified using a URL(encoded) query string
 #filters = string_list(min=0, default=list())
 #filters = <filter-plugin>[?<argument>=<value>[&<argument>=<value>[&...]]],
 #filters = Grep?pattern=sshd.*Invalid user H from (%{ip})&ignorecase&group=1,
@@ -73,7 +73,7 @@ includes = /etc/logwatcherd.d/*.conf,
 # It can either interrupt further processing by returning no data or modify
 # the original filtered data.
 # There can be zero to many conditioners per watcher.
-# Paremeters must be specified using a URL(encoded) query string
+# Parameters must be specified using a URL(encoded) query string
 #conditioners = string_list(min=0, default=list())
 #conditioners = <conditioner-plugin>[?<argument>=<value>[&<argument>=<value>[&...]]],
 #conditioners = Sed?pattern=^192\.168\.0\.&not,
@@ -82,7 +82,7 @@ includes = /etc/logwatcherd.d/*.conf,
 # A consumer is responsible for taking proper action based on the data
 # provided to it (rule name, producer raw data and filter output data).
 # There must be at least one consumer per watcher.
-# Paremeters must be specified using a URL(encoded) query string
+# Parameters must be specified using a URL(encoded) query string
 #consumers = string_list(min=1)
 #consumers = <consumer-plugin>[?<argument>=<value>[&<argument>=<value>[&...]]],
 #consumers = Write?file=/proc/net/xt_recent/IPS_DROP, Mail?recipient=root@example.org,
