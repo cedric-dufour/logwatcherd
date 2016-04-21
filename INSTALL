@@ -59,5 +59,15 @@ INSTALL
 
    b. using the debian package:
 
-      BASH: dpkg -i logwatcherd_@version@_all.deb
+      BASH: dpkg -i logwatcherd_@version@_all.deb logwatcherd-*_@version@_all.deb
+
+
+USAGE
+-----
+
+To get you started with the Log Watcher Daemon (logwatcherd), please:
+
+      BASH: logwatcherd --help
+      BASH: more logwatcherd.conf.sample
+      BASH: logwatcherd --plugin-help <plugin-type>.<plugin-name>
 
