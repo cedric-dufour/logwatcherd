@@ -49,7 +49,7 @@ class Read(Producer):
              Delay between lines feed, in seconds
 
     Example (watcher configuration):
-     - producer = Read?file=/var/log/syslog&delay=1,
+     - producer = Read?file=/var/log/syslog&delay=1
     """
 
     #------------------------------------------------------------------------------

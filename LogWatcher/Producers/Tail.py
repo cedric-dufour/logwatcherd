@@ -51,7 +51,7 @@ class Tail(Producer):
              File check interval, in seconds
 
     Example (watcher configuration):
-     - producer = Tail?file=/var/log/syslog,
+     - producer = Tail?file=/var/log/syslog
     """
 
     #------------------------------------------------------------------------------
