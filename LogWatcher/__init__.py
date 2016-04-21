@@ -32,5 +32,6 @@ LOGWATCHER_CONFIGSPEC = 'logwatcherd.conf.spec'
 # LogWatcher
 from .Data import Data
 from .Logger import Logger
+from .Plugin import Plugin
 from .Watcher import Watcher
 from .Daemon import Daemon

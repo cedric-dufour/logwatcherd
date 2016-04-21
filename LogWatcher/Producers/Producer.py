@@ -26,12 +26,16 @@ from .ProducerQueue import ProducerQueue, Busy
 from Queue import Empty
 from threading import Thread
 
+# LogWatcher
+from LogWatcher import Plugin
+
+
 
 #------------------------------------------------------------------------------
 # CLASSES
 #------------------------------------------------------------------------------
 
-class Producer:
+class Producer(Plugin):
     """
     Log Data Producer.
 
@@ -54,14 +58,14 @@ class Producer:
         @param  float    _fTimeout        Data feed timeout
         """
 
+        # Parent constructor
+        Plugin.__init__(self, _oWatcher, _sConfiguration)
+
         # Fields
-        self._oWatcher = _oWatcher
-        self._sConfiguration = _sConfiguration
         self.__bSynchronous = _bSynchronous
         self.__bBlocking = _bBlocking
         self.__fTimeout = _fTimeout
         self._bStop = False
-        self._bDebug = self._oWatcher.debug()
 
         # ... co-worker thread
         if not self.__bSynchronous:

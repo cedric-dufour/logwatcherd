@@ -18,38 +18,30 @@
 #
 
 #------------------------------------------------------------------------------
-# DEPENDENCIES
-#------------------------------------------------------------------------------
-
-# LogWatcher
-from LogWatcher import Plugin
-
-
-#------------------------------------------------------------------------------
 # CLASSES
 #------------------------------------------------------------------------------
 
-class Consumer(Plugin):
+class Plugin:
     """
-    Log Data Consumer.
+    Log Watcher Daemon Plugin base class.
 
-    This class is to be inherited by actual consumers and describes the methods
-    expected to be overriden.
+    This class acts as the very base class for producers, filters, conditioners
+    and consumers.
     """
 
     #------------------------------------------------------------------------------
-    # METHODS - TO BE OVERRIDDEN
+    # CONSTRUCTORS / DESTRUCTOR
     #------------------------------------------------------------------------------
 
-    def feed(self, _oData):
+    def __init__(self, _oWatcher, _sConfiguration):
         """
-        Process data (object) output by the filter.
+        Constructor.
 
-        The default implementation is to do nothing (exit immediately).
-
-        @param  Data  _oData  Filtered data (object)
+        @param  Watcher  _oWatcher        Parent watcher
+        @param  string   _sConfiguration  Configuration string (URL query string)
         """
 
-        # Action
-        # (this is where your actual consumer business ought to be implemented)
-        pass
+        # Fields
+        self._oWatcher = _oWatcher
+        self._sConfiguration = _sConfiguration
+        self._bDebug = self._oWatcher.debug()

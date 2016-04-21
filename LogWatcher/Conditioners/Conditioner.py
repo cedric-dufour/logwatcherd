@@ -22,38 +22,20 @@
 #------------------------------------------------------------------------------
 
 # LogWatcher
-from LogWatcher import Data
+from LogWatcher import Plugin, Data
 
 
 #------------------------------------------------------------------------------
 # CLASSES
 #------------------------------------------------------------------------------
 
-class Conditioner:
+class Conditioner(Plugin):
     """
     Log Data Conditioner.
 
     This class is to be inherited by actual conditioners and describes the methods
     expected to be overriden.
     """
-
-    #------------------------------------------------------------------------------
-    # CONSTRUCTORS / DESTRUCTOR
-    #------------------------------------------------------------------------------
-
-    def __init__(self, _oWatcher, _sConfiguration):
-        """
-        Constructor.
-
-        @param  Watcher  _oWatcher        Parent watcher
-        @param  string   _sConfiguration  Configuration string (URL query string)
-        """
-
-        # Fields
-        self._oWatcher = _oWatcher
-        self._sConfiguration = _sConfiguration
-        self._bDebug = self._oWatcher.debug()
-
 
     #------------------------------------------------------------------------------
     # METHODS - TO BE OVERRIDDEN
