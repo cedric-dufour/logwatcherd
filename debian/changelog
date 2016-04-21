@@ -1,3 +1,16 @@
+logwatcherd (2.0.20160421a) UNRELEASED; urgency=low
+
+  * New release
+  - FIX: Typo in sample configuration file
+  - ADD: New '--plugin-help' command-line option
+  - MOD: New 'Plugin' base class for plugins
+  - MOD: Add some USAGE information to the INSTALL file
+  - ADD: Allow to build RPM package (output untested)
+  - FIX: Remove trailing comma from producers configuration example
+  - ADD: Delete '*.pyc' files when cleaning the source tree
+
+ -- Cedric Dufour <cedric.dufour@ced-network.net>  Thu, 21 Apr 2016 10:59:13 +0200
+
 logwatcherd (2.0.20160420a) UNRELEASED; urgency=low
 
   * New release
