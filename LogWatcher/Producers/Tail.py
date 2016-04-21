@@ -38,12 +38,20 @@ class Tail(Producer):
     """
     File "Tail" Producer (similar to UNIX 'tail -F ...').
 
-    This producer watchs the given file and feeds new lines to its parent watcher
-    as they appear.
+    This producer watches the configured file and feeds new lines to its parent
+    watcher as they appear.
+
+    It will detect when a file is being (log)rotated and (wait for and) open
+    the new file to continue its business.
 
     Configuration parameters are:
-     - [MANDATORY] file=<string>:    file path
-     - [OPTIONAL]  interval=<float>: file check interval, in seconds (default: 1.0)
+     - [REQ] file=<string>
+             File path
+     - [opt] interval=<float> (default: 1.0)
+             File check interval, in seconds
+
+    Example (watcher configuration):
+     - producer = Tail?file=/var/log/syslog,
     """
 
     #------------------------------------------------------------------------------

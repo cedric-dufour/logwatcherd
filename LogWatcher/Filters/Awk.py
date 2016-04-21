@@ -38,21 +38,29 @@ class Awk(Filter):
     """
     Awk-like Filter.
 
-    This filter tests the requested input data field against the configured
-    regular expression and outputs the requested output data field.
+    This filter tests the configured input data field against the configured
+    regular expression and outputs the configured output data field.
 
     Configuration parameters are:
-     - [OPTIONAL]  separator=<string>: field separator (default: ,)
-     - [MANDATORY] input=<int>:        input/filter data field (note: 0=the entire line)
-     - [MANDATORY] pattern=<string>:   regular expression
-     - [OPTIONAL]  ignorecase:         case-insensitive flag
-     - [OPTIONAL]  output=<int>:       output data field (default: 0=the entire line)
+     - [opt] separator=<string> (default: ',')
+             Field separator
+     - [REQ] input=<int>
+             Input/filter data field (0=the entire line)
+     - [REQ] pattern=<string>
+             Regular expression
+     - [opt] ignorecase (flag)
+             Case-insensitive match
+     - [opt] output=<int> (default: 0)
+             Output data field (0=the entire line)
 
     In addition, the following "magic snippets" can be used to match specific data:
      - '%{ip}':    IP address (IPv4 or IPv6)
      - '%{ipv4}':  IPv4 address
      - '%{ipv6}':  IPv6 address
      - '%{email}': e-mail address
+
+    Example (watcher configuration):
+     - filters = Awk?input=1&pattern=error&output=1,
     """
 
     #------------------------------------------------------------------------------

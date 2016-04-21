@@ -43,23 +43,33 @@ class Mail(Consumer):
     """
     E-Mail Sender Consumer.
 
-    This consumer sends the provided data to the given mail recipient.
+    This consumer sends the provided data to the configured mail recipient.
 
     Configuration parameters are:
-     - [OPTIONAL]  host=<string>:     server host name (default: localhost)
-     - [OPTIONAL]  port=<int>:        server port (default: 25)
-     - [OPTIONAL]  sendmail=<string>: path to local sendmail binary (overrides host/port above)
-     - [OPTIONAL]  from=<email>:      sender address (default: "logwatcherd@%{hostname}")
-     - [MANDATORY] to=<email>:        recipient address
-     - [OPTIONAL]  subject=<string>:  e-mail subject (default: "LogWatcher/%{watcher}: %{data}")
-     - [OPTIONAL]  template=<file>:   e-mail body template file
+     - [opt] host=<string> (default: 'localhost')
+             Server host name
+     - [opt] port=<int> (default: 25)
+             Server port
+     - [opt] sendmail=<string>
+             Path to local sendmail binary (overrides host/port above)
+     - [opt] from=<email> (default: 'logwatcherd@%{hostname}')
+             Sender address
+     - [REQ] to=<email>
+             Recipient address
+     - [opt] subject=<string> (default: 'LogWatcher/%{watcher}: %{data}')
+             E-mail subject
+     - [opt] template=<file>
+             E-mail body template file
 
-    In addition, the following "magic snippets" can be used to insert specific data in the
-    e-mail subject or body template:
+    In addition, the following "magic snippets" can be used to insert specific
+    data in the e-mail subject or body template:
      - '%{hostname}': the local host name
      - '%{watcher}':  the watcher name
      - '%{data}':     the filter (output) data
      - '%{data_raw}': the producer (raw) data
+
+    Example (watcher configuration):
+     - consumers = Mail?to=root@example.org,
     """
 
     #------------------------------------------------------------------------------

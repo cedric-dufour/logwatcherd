@@ -36,14 +36,23 @@ class Write(Consumer):
     """
     File Writer Consumer.
 
-    This consumer writes the provided data to the given file.
+    This consumer writes the provided data to the configured file.
 
     Configuration parameters are:
-     - [MANDATORY] file=<string>:   file path
-     - [OPTIONAL]  truncate:        file truncate flag
-     - [OPTIONAL]  exclusive:       exclusive access flag
-     - [OPTIONAL]  prefix=<string>: prefix data written to file
-     - [OPTIONAL]  suffix=<string>: suffix data written to file
+     - [REQ] file=<string>
+             File path
+     - [opt] truncate (flag)
+             Truncate file before writing data (by default, data are appended)
+     - [opt] exclusive (flag)
+             An exlusive file is opened once when the watcher starts and closed
+             when it exits (rather than each time data must be written to it)
+     - [opt] prefix=<string>
+             Prefix data written to file
+     - [opt] suffix=<string>
+             Suffix data written to file
+
+    Example (watcher configuration):
+     - consumers = Write?file=/var/log/badauth.log&exclusive,
     """
 
     #------------------------------------------------------------------------------

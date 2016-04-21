@@ -37,12 +37,19 @@ class Read(Producer):
     """
     File Reader Producer.
 
-    This producer reads the given file and feeds it to its parent watcher line by line.
+    This producer reads the configured file and feeds it to its parent watcher
+    line by line.
+
     It is useful mostly for debugging purposes.
 
     Configuration parameters are:
-     - [MANDATORY] file=<string>: file path
-     - [OPTIONAL]  delay=<float>: delay between lines feed, in seconds (default: 0.0)
+     - [REQ] file=<string>
+             File path
+     - [opt] delay=<float> (default: 0.0)
+             Delay between lines feed, in seconds
+
+    Example (watcher configuration):
+     - producer = Read?file=/var/log/syslog&delay=1,
     """
 
     #------------------------------------------------------------------------------

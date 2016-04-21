@@ -130,6 +130,12 @@ class Daemon:
             '-v', '--version', action='version',
             version=('logwatcherd - %s - Cedric Dufour <http://cedric.dufour.name>\n' % LOGWATCHER_VERSION))
 
+        # ... plugin help
+        self.__oArgumentParser.add_argument(
+            '--plugin-help', type=str,
+            metavar='<plugin-type>.<plugin-name>',
+            help='Display further help for the given plugin (example: Producer.Read)')
+
 
     def __initArguments(self, _aArguments=None):
         """
@@ -474,6 +480,24 @@ class Daemon:
         iReturn = self.__initArguments()
         if iReturn:
             return iReturn
+
+        # ... help
+        if self.__oArguments.plugin_help is not None:
+            iSeparator = self.__oArguments.plugin_help.find('.')
+            sPluginType = self.__oArguments.plugin_help[0:iSeparator] \
+                .capitalize() \
+                .replace('Producers', 'Producer') \
+                .replace('Filters', 'Filter') \
+                .replace('Conditioners', 'Conditioner') \
+                .replace('Consumers', 'Consumer')
+            sPluginName = self.__oArguments.plugin_help[iSeparator+1:] \
+                .capitalize()
+            try:
+                oPluginClass = getattr(__import__('LogWatcher.%ss.%s' % (sPluginType, sPluginName), fromlist=['LogWatcher.%ss' % sPluginType]), sPluginName)
+                help(oPluginClass)
+            except Exception as e:
+                sys.stderr.write('ERROR[Daemon]: Invalid plugin (%s.%s)\n%s\n' % (sPluginType, sPluginName, str(e)))
+            return 0
 
         # ... configuration
         iReturn = self.__initConfigObj()

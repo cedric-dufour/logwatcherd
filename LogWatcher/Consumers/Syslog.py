@@ -39,17 +39,31 @@ class Syslog(Consumer):
     """
     Syslog Consumer.
 
-    This consumer writes the provided data to the given syslog facility.
+    This consumer writes the provided data to the configured syslog facility.
 
     Configuration parameters are:
-     - [OPTIONAL]  host=<string>:   server host name (default: localhost)
-     - [OPTIONAL]  port=<int>:      server port (default: 514)
-     - [OPTIONAL]  tcp:             connect via TCP (instead of UDP)
-     - [OPTIONAL]  socket=<string>: local UNIX socket (overrides host/port above)
-     - [OPTIONAL]  facility:        syslog facility (default: USER)
-     - [OPTIONAL]  level:           syslog level (default: INFO)
-     - [OPTIONAL]  prefix=<string>: prefix data written to syslog
-     - [OPTIONAL]  suffix=<string>: suffix data written to syslog
+     - [opt] host=<string> (default: 'localhost')
+             Server host name
+     - [opt] port=<int> (default: 514)
+             Server port
+     - [opt] tcp (flag)
+             Connect via TCP (instead of UDP)
+     - [opt] socket=<string>
+             Local UNIX socket (overrides host/port above)
+     - [opt] facility=<string> (default: 'USER')
+             Syslog facility
+     - [opt] level=<string> (default: 'INFO')
+             Syslog level
+     - [opt] prefix=<string>
+             Prefix data written to syslog
+     - [opt] suffix=<string>
+             Suffix data written to syslog
+
+    Please refer to 'man 3 syslog' for the list of supported syslog facilities
+    and levels.
+
+    Example (watcher configuration):
+     - consumers = Syslog?socket=/dev/log&facility=AUTH&level=CRIT,
     """
 
     #------------------------------------------------------------------------------

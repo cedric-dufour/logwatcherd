@@ -39,12 +39,15 @@ class Grep(Filter):
     Regular-Expression Filter.
 
     This filter tests the provided data against the configured regular expression
-    and outputs the data corresponding to the requested group.
+    and outputs the data corresponding to the configured group.
 
     Configuration parameters are:
-     - [MANDATORY] pattern=<string>: regular expression
-     - [OPTIONAL]  ignorecase:       case-insensitive flag
-     - [OPTIONAL]  group=<int>:      output data group (default: 0=the entire line)
+     - [REQ] pattern=<string>
+             Regular expression
+     - [opt] ignorecase (flag)
+             Case-insensitive match
+     - [opt] group=<int> (default: 0)
+             Output data group (0=the entire line)
 
     In addition, the following "magic snippets" can be used to match/output
     specific data:
@@ -52,6 +55,9 @@ class Grep(Filter):
      - '%{ipv4}':  IPv4 address
      - '%{ipv6}':  IPv6 address
      - '%{email}': e-mail address
+
+    Example (watcher configuration):
+     - filters = Grep?pattern=authentication failure from (%{ip})&group=1,
     """
 
     #------------------------------------------------------------------------------

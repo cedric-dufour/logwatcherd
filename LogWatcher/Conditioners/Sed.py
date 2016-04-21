@@ -52,11 +52,16 @@ class Sed(Conditioner):
     can be inserted in the replacement string by using "\<int>" backreferences).
 
     Configuration parameters are:
-     - [MANDATORY] pattern=<string>: regular expression
-     - [OPTIONAL]  ignorecase:       case-insensitive flag
-     - [OPTIONAL]  not:              logical not flag
-     - [OPTIONAL]  raw:              test the producer (raw) data instead of the filter (output) data
-     - [OPTIONAL]  replace=<string>: replacement data
+     - [REQ] pattern=<string>
+             Regular expression
+     - [opt] ignorecase (flag)
+             Case-insensitive match
+     - [opt] not (flag)
+             Invert match logic (logical not)
+     - [opt] raw (flag)
+             Test the producer (raw) data instead of the filter (output) data
+     - [opt] replace=<string>
+             Replacement data
 
     In addition, the following "magic snippets" can be used to match/output
     specific data:
@@ -64,6 +69,9 @@ class Sed(Conditioner):
      - '%{ipv4}':  IPv4 address
      - '%{ipv6}':  IPv6 address
      - '%{email}': e-mail address
+
+    Example (watcher configuration):
+     - conditioners = Sed?pattern=foo&replace=bar,
     """
 
     #------------------------------------------------------------------------------
