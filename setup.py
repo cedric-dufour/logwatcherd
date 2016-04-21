@@ -13,8 +13,7 @@ setup(
     long_description = \
 """
 The objective of the Log Watcher Daemon (logwatcherd) is to provide a simple and
-modular way to watch logs for specific events and take appropriate corresponding
-actions.
+modular way to watch logs for specific events and take appropriate actions.
 
 It consists of a Python daemon that spawns multiple "watcher" threads, defined
 in a single configuration file.
@@ -26,7 +25,7 @@ Each watcher consists of:
    e.g. looking for failed login attempts
  - zero-to-many "Conditioner(s)", which further filter or modify the data;
    e.g. excluding IP addresses from the LAN
- - one-to-many "Consumer(s)", which take actions based on that data
+ - one-to-many "Consumer(s)", which take actions based on that data;
    e.g. add an IP address to an iptables blacklist
 
 Producers, filters, conditioners and consumers are all plugins. A set of basic
