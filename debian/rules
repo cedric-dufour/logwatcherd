@@ -43,6 +43,10 @@ override_dh_install:
 override_dh_installdocs:
 	dh_installdocs README examples
 
+override_dh_clean:
+	dh_clean
+	rm -rf MANIFEST build dist
+
 build-source-tarball:
 	dh_testdir
 	dh_clean build-stamp
@@ -66,5 +70,8 @@ debian-packages:
 debian-source:
 	debuild -I'.git*' -I'*.pyc' -us -uc -S
 
-release: debian-packages build-install-tarball debian-source build-source-tarball ;
+rpm-packages:
+	python2 setup.py bdist_rpm --python python2
+
+release: debian-packages build-install-tarball debian-source build-source-tarball rpm-packages ;
 
