@@ -46,6 +46,7 @@ override_dh_installdocs:
 override_dh_clean:
 	dh_clean
 	rm -rf MANIFEST build dist
+	find LogWatcher -name '*.pyc' -delete
 
 build-source-tarball:
 	dh_testdir
