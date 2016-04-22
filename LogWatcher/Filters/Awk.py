@@ -138,7 +138,10 @@ class Awk(Filter):
         lsFields = _sData.split(self.__sFieldSeparator)
 
         # Test the requested field against the regular expression
-        oMatch = self.__oRegExp.search(_sData if self.__iFieldInput==0 else lsFields[self.__iFieldInput-1])
+        try:
+            oMatch = self.__oRegExp.search(_sData if self.__iFieldInput==0 else lsFields[self.__iFieldInput-1])
+        except IndexError:
+            return None
         if oMatch is None:
             return None
 
