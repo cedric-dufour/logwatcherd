@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 # Standard
-from Queue import Queue
+from queue import Queue
 from time import time
 
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python2
 # -*- mode:python; tab-width:4; c-basic-offset:4; intent-tabs-mode:nil; -*-
 # ex: filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab autoindent smartindent
 
@@ -67,6 +66,6 @@ provides some service (e.g. a virtual machine providing SSH remote access).
     url = 'https://github.com/cedric-dufour/logwatcherd',
     download_url = 'https://github.com/cedric-dufour/logwatcherd',
     packages = [ 'LogWatcher', 'LogWatcher.Producers', 'LogWatcher.Filters', 'LogWatcher.Conditioners', 'LogWatcher.Consumers' ],
-    requires = [ 'argparse', 'configobj', 'daemon' ],
+    requires = [ 'configobj', 'daemon' ],
     scripts = [ 'logwatcherd' ],
     )

@@ -23,7 +23,7 @@
 
 # Standard
 import re
-import urlparse
+import urllib.parse
 
 # LogWatcher
 from LogWatcher.Filters import Filter
@@ -72,7 +72,7 @@ class Awk(Filter):
         Filter.__init__(self, _oWatcher, _sConfiguration)
 
         # Configuration
-        dConfiguration = urlparse.parse_qs(_sConfiguration, keep_blank_values=True)
+        dConfiguration = urllib.parse.parse_qs(_sConfiguration, keep_blank_values=True)
         dConfiguration_keys = dConfiguration.keys()
 
         # ... separator

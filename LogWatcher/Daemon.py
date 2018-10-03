@@ -22,6 +22,7 @@
 #------------------------------------------------------------------------------
 
 # Standard
+import argparse
 from distutils.util import \
      strtobool
 import errno
@@ -34,11 +35,10 @@ import syslog
 import threading
 import time
 import traceback
-import urlparse
+import urllib.parse
 
 # Extra
-# ... deb: python-argparse, python-configobj, python-daemon
-import argparse
+# ... deb: python3-configobj, python3-daemon
 import configobj
 from daemon import \
     DaemonContext
@@ -250,12 +250,12 @@ class Daemon:
             if self.__bStop: return
 
         # Loop through configured watchers (<=> sections)
-        for sWatcherName in list(_oConfigObj.keys()):
+        for sWatcherName in _oConfigObj.keys():
             if sWatcherName=='LogWatcher':
                 continue  # global configuration
 
             dWatcherConfig = _oConfigObj[sWatcherName]
-            dWatcherConfig_keys = list(dWatcherConfig.keys())
+            dWatcherConfig_keys = dWatcherConfig.keys()
 
             # Enable ?
             if not dWatcherConfig['enable']:
@@ -282,7 +282,7 @@ class Daemon:
             fTimeout = dWatcherConfig['timeout']
 
             # Producer
-            dPluginConfig = urlparse.urlparse(dWatcherConfig['producer'])
+            dPluginConfig = urllib.parse.urlparse(dWatcherConfig['producer'])
             sPluginName = dPluginConfig.path
             try:
                 oPluginClass = getattr(__import__('LogWatcher.Producers.%s' % sPluginName, fromlist=['LogWatcher.Producers']), sPluginName)
@@ -299,7 +299,7 @@ class Daemon:
             # Filters
             try:
                 for sPluginConfig in dWatcherConfig['filters']:
-                    dPluginConfig = urlparse.urlparse(sPluginConfig)
+                    dPluginConfig = urllib.parse.urlparse(sPluginConfig)
                     sPluginName = dPluginConfig.path
                     try:
                         oPluginClass = getattr(__import__('LogWatcher.Filters.%s' % sPluginName, fromlist=['LogWatcher.Filters']), sPluginName)
@@ -318,7 +318,7 @@ class Daemon:
             # Conditioners
             try:
                 for sPluginConfig in dWatcherConfig['conditioners']:
-                    dPluginConfig = urlparse.urlparse(sPluginConfig)
+                    dPluginConfig = urllib.parse.urlparse(sPluginConfig)
                     sPluginName = dPluginConfig.path
                     try:
                         oPluginClass = getattr(__import__('LogWatcher.Conditioners.%s' % sPluginName, fromlist=['LogWatcher.Conditioners']), sPluginName)
@@ -337,7 +337,7 @@ class Daemon:
             # Consumers
             try:
                 for sPluginConfig in dWatcherConfig['consumers']:
-                    dPluginConfig = urlparse.urlparse(sPluginConfig)
+                    dPluginConfig = urllib.parse.urlparse(sPluginConfig)
                     sPluginName = dPluginConfig.path
                     try:
                         oPluginClass = getattr(__import__('LogWatcher.Consumers.%s' % sPluginName, fromlist=['LogWatcher.Consumers']), sPluginName)

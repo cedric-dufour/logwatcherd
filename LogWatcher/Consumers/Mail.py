@@ -29,7 +29,8 @@ import socket
 from subprocess import \
     Popen, \
     PIPE
-import urlparse
+import sys
+import urllib.parse
 
 # LogWatcher
 from LogWatcher.Consumers import Consumer
@@ -84,7 +85,7 @@ class Mail(Consumer):
         self.__sHostname = socket.getfqdn()
 
         # Configuration
-        dConfiguration = urlparse.parse_qs(_sConfiguration, keep_blank_values=True)
+        dConfiguration = urllib.parse.parse_qs(_sConfiguration, keep_blank_values=True)
         dConfiguration_keys = dConfiguration.keys()
 
         # ... host
@@ -162,7 +163,7 @@ I just got the following data for your attention:
             .replace('%{data}', _oData.data) \
             .replace('%{data_raw}', _oData.data_raw)
         # ... headers
-        oMIMEText = MIMEText( sBody, 'plain', 'utf-8' )
+        oMIMEText = MIMEText( sBody, 'plain' )
         oMIMEText['From'] = self.__sFrom
         oMIMEText['To'] = self.__sTo
         oMIMEText['Subject'] = sSubject
@@ -178,4 +179,4 @@ I just got the following data for your attention:
         else:
             # Sendmail
             oPopen = Popen([self.__sSendmail, '-t'], stdin=PIPE)
-            oPopen.communicate(oMIMEText.as_string())
+            oPopen.communicate(oMIMEText.as_string().encode(sys.stdin.encoding))

@@ -23,7 +23,7 @@
 
 # Standard
 from .ProducerQueue import ProducerQueue, Busy
-from Queue import Empty
+from queue import Empty
 from threading import Thread
 
 # LogWatcher
