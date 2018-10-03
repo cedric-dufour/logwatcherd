@@ -4,23 +4,19 @@
 export PACKAGE = logwatcherd
 export VERSION := $(shell dpkg-parsechangelog | egrep '^Version:' | cut -f 2 -d ' ')
 
+# Let's keep our source tree clean
+export PYTHONDONTWRITEBYTECODE=1
+
 # Required for 'help2man'
 export PYTHONPATH:=.:${PYTHONPATH}
 export PATH:=.:${PATH}
 
 %:
-	dh $@ --with python2 --buildsystem=pybuild
-
-override_dh_pysupport:
-	# NOTE: we implement our own 'python-support' in order to package Python 2.6
-	#       even on platforms where it is deprecated
+	dh $@ --with python3,systemd --buildsystem=pybuild
 
 override_dh_install:
-	# Support given Python2 versions
-	debian/pyshared debian/tmp 2.6 2.7
-
 	# Fix global variables
-	sed -i "s|LOGWATCHER_VERSION\s*=.*|LOGWATCHER_VERSION = '$(VERSION)'|;s|LOGWATCHER_CONFIGSPEC\s*=.*|LOGWATCHER_CONFIGSPEC = '/usr/share/$(PACKAGE)/logwatcherd.conf.spec'|" debian/tmp/usr/share/pyshared/LogWatcher/__init__.py
+	sed -i "s|LOGWATCHER_VERSION\s*=.*|LOGWATCHER_VERSION = '$(VERSION)'|;s|LOGWATCHER_CONFIGSPEC\s*=.*|LOGWATCHER_CONFIGSPEC = '/usr/share/$(PACKAGE)/logwatcherd.conf.spec'|" debian/tmp/usr/lib/*/dist-packages/LogWatcher/__init__.py
 
 	# Install additional stuff
 	#mkdir -p debian/tmp/usr/bin
@@ -47,6 +43,7 @@ override_dh_clean:
 	dh_clean
 	rm -rf MANIFEST build dist
 	find LogWatcher -name '*.pyc' -delete
+	find LogWatcher -type d -name '__pycache__' -exec rmdir {} \;
 
 build-source-tarball:
 	dh_testdir
@@ -71,8 +68,5 @@ debian-packages:
 debian-source:
 	debuild -I'.git*' -I'*.pyc' -us -uc -S
 
-rpm-packages:
-	python2 setup.py bdist_rpm --python python2
-
-release: debian-packages build-install-tarball debian-source build-source-tarball rpm-packages ;
+release: debian-packages build-install-tarball debian-source build-source-tarball ;
 

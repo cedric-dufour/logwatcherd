@@ -2,14 +2,14 @@ Source: logwatcherd
 Section: admin
 Priority: optional
 Maintainer: Cedric Dufour <cedric.dufour@ced-network.net>
-Build-Depends: python (>= 2.6), python (<< 3), debhelper (>= 8), dh-python, bash, help2man
-XS-Python-Version: 2.6, 2.7
+Build-Depends: python3 (>= 3.4), debhelper (>= 9), dh-python, bash, help2man
+X-Python3-Version: >= 3.4
 Homepage: https://github.com/cedric-dufour/logwatcherd
-Standards-Version: 3.9.4
+Standards-Version: 4.1.3
 
 Package: logwatcherd
 Architecture: all
-Depends: logwatcherd-python2.7 | logwatcherd-python2.6
+Depends: logwatcherd-python3
 Description: Log Watcher Daemon (logwatcherd)
  The objective of the Log Watcher Daemon (logwatcherd) is to provide a simple and
  modular way to watch logs for specific events and take appropriate actions.
@@ -58,18 +58,8 @@ Description: Log Watcher Daemon (logwatcherd)
  lightweight and simple, and its purpose is being distributed on each host that
  provides some service (e.g. a virtual machine providing SSH remote access).
 
-Package: logwatcherd-pyshared
+Package: logwatcherd-python3
 Architecture: all
-Depends: python (>= 2.6), python (<< 3), python-argparse, python-configobj, python-daemon
-Description: Log Watcher Daemon (logwatcherd) - Python 2.x codebase
-
-Package: logwatcherd-python2.6
-Architecture: all
-Depends: python (>= 2.6), python (<< 2.7), logwatcherd-pyshared
-Description: Log Watcher Daemon (logwatcherd) - Python 2.6 packaging
-
-Package: logwatcherd-python2.7
-Architecture: all
-Depends: python (>= 2.7), python (<< 2.8), logwatcherd-pyshared
-Description: Log Watcher Daemon (logwatcherd) - Python 2.7 packaging
+Depends: python3 (>= 3.4), python3-configobj, python3-daemon
+Description: Log Watcher Daemon (logwatcherd) - Python 3.x packaging
 

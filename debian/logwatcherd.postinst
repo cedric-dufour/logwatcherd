@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+#DEBHELPER#
+
+case "$1" in
+  'configure')
+     if test -n "$2" && dpkg --compare-versions "$2" lt "3"; then
+       # Restart the service after init/systemd upgrade/migration
+       invoke-rc.d logwatcherd restart || true
+     fi
+     ;;
+esac
+
+exit 0
+

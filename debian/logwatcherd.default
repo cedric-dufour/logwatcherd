@@ -1,3 +1,4 @@
 # Uncomment the following line to allow the Log Watcher Daemon (logwatcherd)
 # to be started by the init.d script
+# WARNING: Ignored by systemd! Use 'systemctl {disable|enable} logwatcherd'
 #START=yes

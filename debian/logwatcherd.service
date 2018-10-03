@@ -1,0 +1,13 @@
+[Unit]
+Description=Log Watcher Daemon (logwatcherd)
+After=syslog.service
+
+[Service]
+Type=simple
+Environment="PYTHONUNBUFFERED=yes" "CONFIG_FILE=--config=/etc/logwatcherd.conf"
+EnvironmentFile=/etc/default/logwatcherd
+ExecStart=/usr/bin/logwatcherd -f ${CONFIG_FILE}
+
+[Install]
+WantedBy=multi-user.target
+
