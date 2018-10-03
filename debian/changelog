@@ -1,3 +1,12 @@
+logwatcherd (2.0.20160504a) UNRELEASED; urgency=low
+
+  * New release
+  - FIX: Minor corrections in README file
+  - FIX: [Filters.Awk] Handle input field index error gracefully
+  - MOD: Corrections and additions to the examples directory
+
+ -- Cedric Dufour <cedric.dufour@ced-network.net>  Wed, 04 May 2016 14:59:26 +0200
+
 logwatcherd (2.0.20160421a) UNRELEASED; urgency=low
 
   * New release
