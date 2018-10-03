@@ -1,3 +1,9 @@
+logwatcherd (3.0.20181003a) UNRELEASED; urgency=low
+
+  * New release, for Python 3.x
+
+ -- Cédric Dufour <cedric.dufour@ced-network.net>  Wed, 03 Oct 2018 11:09:41 +0200
+
 logwatcherd (2.0.20160504a) UNRELEASED; urgency=low
 
   * New release
