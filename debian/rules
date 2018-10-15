@@ -39,6 +39,9 @@ override_dh_install:
 override_dh_installdocs:
 	dh_installdocs README examples
 
+override_dh_systemd_enable:
+	dh_systemd_enable --no-enable
+
 override_dh_clean:
 	dh_clean
 	rm -rf MANIFEST build dist
@@ -62,11 +65,14 @@ build-install-tarball:
 	tar -C /tmp -cjf ../$(PACKAGE)-$(VERSION).tar.bz2 $(PACKAGE)-$(VERSION)
 	rm -rf /tmp/$(PACKAGE)-$(VERSION)
 
-debian-packages:
-	debuild -us -uc -b
-
 debian-source:
-	debuild -I'.git*' -I'*.pyc' -us -uc -S
+	dpkg-buildpackage -I'.git*' -I'*.pyc' -us -uc -s -S
 
-release: debian-packages build-install-tarball debian-source build-source-tarball ;
+debian-build:
+	dpkg-buildpackage -us -uc -b
+
+debian-clean:
+	dpkg-buildpackage -T clean
+
+release: debian-build build-install-tarball debian-source build-source-tarball ;
 

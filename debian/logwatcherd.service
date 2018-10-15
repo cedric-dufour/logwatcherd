@@ -1,6 +1,6 @@
 [Unit]
 Description=Log Watcher Daemon (logwatcherd)
-After=syslog.service
+After=local-fs.target syslog.service
 
 [Service]
 Type=simple

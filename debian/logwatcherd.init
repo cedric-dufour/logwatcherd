@@ -24,7 +24,6 @@ PID=/var/run/logwatcherd.pid
 # Include defaults if available
 START=no
 [ -e "${DEFAULT}" ] && . "${DEFAULT}"
-[ "${START}" != 'yes' ] && echo "INFO: Daemon is disabled (in ${DEFAULT})" && exit 0
 
 # Check runtime environment
 [ ! -x "${EXEC}" ] && echo "ERROR: Missing/invalid executable (${EXEC})" >&2 && exit 1
@@ -34,6 +33,7 @@ START=no
 case "${1}" in
 
     start)
+        [ "${START}" != 'yes' ] && echo "INFO: Daemon is disabled (in ${DEFAULT})" && exit 0
         log_daemon_msg "Starting ${DESC}" "${NAME}"
         if start-stop-daemon --start --quiet --oknodo --pidfile "${PID}" --exec "${EXEC}" -- --config "${CONFIG}" --pid "${PID}"; then
             log_end_msg 0

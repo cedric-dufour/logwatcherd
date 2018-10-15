@@ -10,8 +10,9 @@ semantic.cache
 # Ignore Python packaging directory
 /build
 
-# Ignore Debian packaging directories
+# Ignore Debian packaging resources
 /.pybuild
+/debian/debhelper-build-stamp
 /debian/files
 /debian/*.debhelper
 /debian/*.debhelper.log
