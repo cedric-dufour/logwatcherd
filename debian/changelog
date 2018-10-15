@@ -1,3 +1,9 @@
+logwatcherd (3.0.20181015a) UNRELEASED; urgency=low
+
+  - FIX: Debian installer init/service files
+
+ -- Cédric Dufour <cedric.dufour@ced-network.net>  Mon, 15 Oct 2018 12:19:49 +0200
+
 logwatcherd (3.0.20181003a) UNRELEASED; urgency=low
 
   * New release, for Python 3.x
