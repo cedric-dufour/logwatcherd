@@ -1,3 +1,11 @@
+logwatcherd (3.0.20190727a) UNRELEASED; urgency=low
+
+  * New release
+  - FIX: Debian packaging (now Python3 minor version agnostic)
+  - CHG: Get rid of 'distutils' dependency
+
+ -- Cédric Dufour <cedric.dufour@ced-network.net>  Sat, 27 Jul 2019 21:04:22 +0200
+
 logwatcherd (3.0.20181015a) UNRELEASED; urgency=low
 
   - FIX: Debian installer init/service files
