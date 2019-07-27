@@ -61,6 +61,6 @@ Description: Log Watcher Daemon (logwatcherd)
 
 Package: logwatcherd-python3
 Architecture: all
-Depends: ${misc:Depends}, python3 (>= 3.4), python3-configobj, python3-daemon
+Depends: ${misc:Depends}, ${python3:Depends}
 Description: Log Watcher Daemon (logwatcherd) - Python 3.x packaging
 
