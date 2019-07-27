@@ -23,8 +23,6 @@
 
 # Standard
 import argparse
-from distutils.util import \
-     strtobool
 import errno
 import glob
 import os
@@ -178,7 +176,7 @@ class Daemon:
         if 'LogWatcher' in self.__oConfigObj.keys():
             if 'debug' in self.__oConfigObj['LogWatcher'].keys():
                 try:
-                    bDebug = strtobool(self.__oConfigObj['LogWatcher']['debug'])
+                    bDebug = self.__oConfigObj['LogWatcher']['debug'].lower() in ['1', 't', 'true', 'y', 'yes']
                 except ValueError:
                     pass
             if 'includes' in self.__oConfigObj['LogWatcher'].keys():
