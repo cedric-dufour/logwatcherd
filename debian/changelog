@@ -1,3 +1,10 @@
+logwatcherd (3.0.20251011a) UNRELEASED; urgency=low
+
+  * New release
+  - FIX: Get rid of deprecated daemon.runner dependencies
+
+ -- Cédric Dufour <cedric.dufour@ced-network.net>  Sat, 11 Oct 2025 18:15:19 +0200
+
 logwatcherd (3.0.20190727a) UNRELEASED; urgency=low
 
   * New release
@@ -48,7 +55,7 @@ logwatcherd (2.0.20160420a) UNRELEASED; urgency=low
   - ADD: Allow to include configuration files
   - MOD: Allow daemon to exit faster when interrupted
   - FIX: Wait for daemon to stop in init script (and be systemd friendly)
-  - ADD: New 'respawn' configuration parameter allows watcher to respawn        
+  - ADD: New 'respawn' configuration parameter allows watcher to respawn
          in case of error
 
  -- Cedric Dufour <cedric.dufour@ced-network.net>  Wed, 20 Apr 2016 16:00:44 +0200
