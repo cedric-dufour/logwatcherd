@@ -2,15 +2,15 @@
 # ex: filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab autoindent smartindent
 
 # Modules
-from distutils.core import setup
 import os
+from distutils.core import setup
+
 
 # Setup
 setup(
-    name = 'logwatcherd',
-    description = 'Log Watcher Daemon',
-    long_description = \
-"""
+    name="logwatcherd",
+    description="Log Watcher Daemon",
+    long_description="""
 The objective of the Log Watcher Daemon (logwatcherd) is to provide a simple and
 modular way to watch logs for specific events and take appropriate actions.
 
@@ -59,13 +59,19 @@ lightweight and simple, and its purpose is being distributed on each host that
 provides some service (e.g. a virtual machine providing SSH remote access).
 
 """,
-    version = os.getenv('VERSION'),
-    author = 'Cedric Dufour',
-    author_email = 'http://cedric.dufour.name',
-    license = 'GPL-3',
-    url = 'https://github.com/cedric-dufour/logwatcherd',
-    download_url = 'https://github.com/cedric-dufour/logwatcherd',
-    packages = [ 'LogWatcher', 'LogWatcher.Producers', 'LogWatcher.Filters', 'LogWatcher.Conditioners', 'LogWatcher.Consumers' ],
-    requires = [ 'configobj', 'daemon' ],
-    scripts = [ 'logwatcherd' ],
-    )
+    version=os.getenv("VERSION"),
+    author="Cedric Dufour",
+    author_email="http://cedric.dufour.name",
+    license="GPL-3",
+    url="https://github.com/cedric-dufour/logwatcherd",
+    download_url="https://github.com/cedric-dufour/logwatcherd",
+    packages=[
+        "LogWatcher",
+        "LogWatcher.Producers",
+        "LogWatcher.Filters",
+        "LogWatcher.Conditioners",
+        "LogWatcher.Consumers",
+    ],
+    requires=["configobj", "daemon"],
+    scripts=["logwatcherd"],
+)

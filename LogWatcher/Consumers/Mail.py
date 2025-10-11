@@ -17,32 +17,24 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# DEPENDENCIES
-#------------------------------------------------------------------------------
-
-# Standard
-from email.mime.text import \
-    MIMEText
 import smtplib
 import socket
-from subprocess import \
-    Popen, \
-    PIPE
 import sys
 import urllib.parse
+from email.mime.text import MIMEText
+from subprocess import PIPE, Popen
+from typing import TYPE_CHECKING
 
-# LogWatcher
-from LogWatcher.Consumers import Consumer
+from LogWatcher.Consumers.Consumer import Consumer
 
 
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
+if TYPE_CHECKING:
+    from LogWatcher.Data import Data
+    from LogWatcher.Watcher import Watcher
+
 
 class Mail(Consumer):
-    """
-    E-Mail Sender Consumer.
+    """E-Mail Sender Consumer.
 
     This consumer sends the provided data to the configured mail recipient.
 
@@ -73,11 +65,11 @@ class Mail(Consumer):
      - consumers = Mail?to=root@example.org,
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # CONSTRUCTORS / DESTRUCTOR
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def __init__(self, _oWatcher, _sConfiguration):
+    def __init__(self, _oWatcher: "Watcher", _sConfiguration):  # noqa: D107
         # Parent constructor
         Consumer.__init__(self, _oWatcher, _sConfiguration)
 
@@ -86,47 +78,46 @@ class Mail(Consumer):
 
         # Configuration
         dConfiguration = urllib.parse.parse_qs(_sConfiguration, keep_blank_values=True)
-        dConfiguration_keys = dConfiguration.keys()
 
         # ... host
-        self.__sHost = 'localhost'
-        if 'host' in dConfiguration_keys:
-            self.__sHost = dConfiguration['host'][0]
+        self.__sHost = "localhost"
+        if "host" in dConfiguration:
+            self.__sHost = dConfiguration["host"][0]
 
         # ... port
         self.__iPort = 25
-        if 'port' in dConfiguration_keys:
+        if "port" in dConfiguration:
             try:
-                self.__iPort = int(dConfiguration['port'][0])
-                if self.__iPort<0:
-                    raise ValueError('Value must me greater than zero')
+                self.__iPort = int(dConfiguration["port"][0])
+                if self.__iPort < 0:
+                    raise ValueError("Value must me greater than zero")
             except Exception:
-                _oWatcher.log('ERROR[Consumer:Mail(%s)]: Invalid \'port\' configuration parameter\n' % _oWatcher.name())
+                _oWatcher.log("ERROR[Consumer:Mail(%s)]: Invalid 'port' configuration parameter\n" % _oWatcher.name())
                 raise
 
         # ... sendmail path
         self.__sSendmail = None
-        if 'sendmail' in dConfiguration_keys:
-            self.__sSendmail = dConfiguration['sendmail'][0]
+        if "sendmail" in dConfiguration:
+            self.__sSendmail = dConfiguration["sendmail"][0]
 
         # ... from
-        self.__sFrom = 'logwatcherd@%s' % self.__sHostname
-        if 'from' in dConfiguration_keys:
-            self.__sFrom = dConfiguration['from'][0]
+        self.__sFrom = "logwatcherd@%s" % self.__sHostname
+        if "from" in dConfiguration:
+            self.__sFrom = dConfiguration["from"][0]
 
         # ... to
-        if 'to' not in dConfiguration_keys:
-            _oWatcher.log('ERROR[Consumer:Mail(%s)]: Missing \'to\' configuration parameter\n' % _oWatcher.name())
-            raise RuntimeError('Missing \'to\' configuration parameter')
-        self.__sTo = dConfiguration['to'][0]
+        if "to" not in dConfiguration:
+            _oWatcher.log("ERROR[Consumer:Mail(%s)]: Missing 'to' configuration parameter\n" % _oWatcher.name())
+            raise RuntimeError("Missing 'to' configuration parameter")
+        self.__sTo = dConfiguration["to"][0]
 
         # ... subject
-        self.__sSubject = 'LogWatcher/%{watcher}: %{data}'
-        if 'subject' in dConfiguration_keys:
-            self.__sSubject = dConfiguration['subject'][0]
+        self.__sSubject = "LogWatcher/%{watcher}: %{data}"
+        if "subject" in dConfiguration:
+            self.__sSubject = dConfiguration["subject"][0]
 
         # ... template
-        self.__sTemplate = '''
+        self.__sTemplate = """
 This is the Log Watcher Daemon (logwatcherd) running on %{hostname}.
 
 I just got the following data for your attention:
@@ -134,43 +125,50 @@ I just got the following data for your attention:
   Watcher: %{watcher}
   Data:    %{data}
   Raw:     %{data_raw}
-'''
-        if 'template' in dConfiguration_keys:
+"""
+        if "template" in dConfiguration:
             try:
-                with open(dConfiguration['template'][0], 'r') as oFile:
+                with open(dConfiguration["template"][0], "r") as oFile:
                     self.__sTemplate = oFile.read()
             except Exception:
-                _oWatcher.log('ERROR[Consumer:Mail(%s)]: Invalid \'template\' configuration parameter\n' % _oWatcher.name())
+                _oWatcher.log(
+                    "ERROR[Consumer:Mail(%s)]: Invalid 'template' configuration parameter\n" % _oWatcher.name()
+                )
                 raise
 
-
-    #------------------------------------------------------------------------------
+    ############################################################################
     # METHODS
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def feed(self, _oData):
+    def feed(self, _oData: "Data"):  # noqa: D102
         # Build the mail message
         # ... body
         sBody = self.__sTemplate
-        sBody = sBody.replace('%{hostname}', self.__sHostname) \
-            .replace('%{watcher}', _oData.watcher) \
-            .replace('%{data}', _oData.data) \
-            .replace('%{data_raw}', _oData.data_raw)
+        sBody = (
+            sBody.replace("%{hostname}", self.__sHostname)
+            .replace("%{watcher}", _oData.watcher)
+            .replace("%{data}", _oData.data)
+            .replace("%{data_raw}", _oData.data_raw)
+        )
         # ... subject
         sSubject = self.__sSubject
-        sSubject = sSubject.replace('%{hostname}', self.__sHostname) \
-            .replace('%{watcher}', _oData.watcher) \
-            .replace('%{data}', _oData.data) \
-            .replace('%{data_raw}', _oData.data_raw)
+        sSubject = (
+            sSubject.replace("%{hostname}", self.__sHostname)
+            .replace("%{watcher}", _oData.watcher)
+            .replace("%{data}", _oData.data)
+            .replace("%{data_raw}", _oData.data_raw)
+        )
         # ... headers
-        oMIMEText = MIMEText( sBody, 'plain' )
-        oMIMEText['From'] = self.__sFrom
-        oMIMEText['To'] = self.__sTo
-        oMIMEText['Subject'] = sSubject
+        oMIMEText = MIMEText(sBody, "plain")
+        oMIMEText["From"] = self.__sFrom
+        oMIMEText["To"] = self.__sTo
+        oMIMEText["Subject"] = sSubject
 
         # Send the mail message
         if self._bDebug:
-            self._oWatcher.log('DEBUG[Consumer:Mail(%s)]: Consumed data\n%s\n' % (self._oWatcher.name(), oMIMEText.as_string()))
+            self._oWatcher.log(
+                "DEBUG[Consumer:Mail(%s)]: Consumed data\n%s\n" % (self._oWatcher.name(), oMIMEText.as_string())
+            )
         if self.__sSendmail is None:
             # SMTP
             oSTMP = smtplib.SMTP(self.__sHost, self.__iPort)
@@ -178,5 +176,5 @@ I just got the following data for your attention:
             oSTMP.quit()
         else:
             # Sendmail
-            oPopen = Popen([self.__sSendmail, '-t'], stdin=PIPE)
+            oPopen = Popen([self.__sSendmail, "-t"], stdin=PIPE)
             oPopen.communicate(oMIMEText.as_string().encode(sys.stdin.encoding))

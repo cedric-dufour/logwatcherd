@@ -17,13 +17,15 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from typing import Callable
+
 
 class Logger:
-    """
-    Log Watcher Logger.
+    """Log Watcher Logger.
 
     This class is used to redirect the standard log output (sys.stdout or
     sys.stderr) to another destination; e.g. syslog.
@@ -35,39 +37,45 @@ class Logger:
     required output; e.g. sys.stderr = Logger(myLoggingFunction)
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # CONSTRUCTORS / DESTRUCTOR
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def __init__(self, _fnLog):
+    def __init__(self, _fnLog: "Callable"):
+        """Constructor.
+
+        Args:
+            _fnLog: Function that emits a log message to the logging destination
+
+        """
         # Fields
         self.__fnLog = _fnLog
-        self.__sBuffer = ''
+        self.__sBuffer = ""
 
-
-    #------------------------------------------------------------------------------
+    ############################################################################
     # METHODS
-    #------------------------------------------------------------------------------
+    ############################################################################
 
     def flush(self):
+        """Flush the log bugger to the log destination."""
         if self.__sBuffer:
             self.__fnLog(self.__sBuffer)
-            self.__sBuffer = ''
-
+            self.__sBuffer = ""
 
     def write(self, _s):
+        """Writes the given string to the log destination, line-per-line."""
         while _s:
-            i = _s.find('\n')
+            i = _s.find("\n")
             if i < 0:
                 self.__sBuffer += _s
                 break
             self.__sBuffer += _s[:i]
             if self.__sBuffer:
                 self.__fnLog(self.__sBuffer)
-                self.__sBuffer = ''
-            _s = _s[i+1:]
-
+                self.__sBuffer = ""
+            _s = _s[i + 1 :]
 
     def writelines(self, _lsLines):
+        """Writes several lines of string to the log destination."""
         for sLine in _lsLines:
             self.write(sLine)

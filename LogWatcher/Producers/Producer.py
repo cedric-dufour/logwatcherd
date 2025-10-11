@@ -17,47 +17,42 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# DEPENDENCIES
-#------------------------------------------------------------------------------
-
-# Standard
-from .ProducerQueue import ProducerQueue, Busy
 from queue import Empty
 from threading import Thread
+from typing import TYPE_CHECKING
 
-# LogWatcher
-from LogWatcher import Plugin
+from LogWatcher.Plugin import Plugin
+
+from .ProducerQueue import Busy, ProducerQueue
 
 
+if TYPE_CHECKING:
+    from LogWatcher.Watcher import Watcher
 
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
 
 class Producer(Plugin):
-    """
-    Log Data Producer.
+    """Log Data Producer.
 
     This class is to be inherited by actual producers and described the methods
     expected to be overriden.
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # CONSTRUCTORS / DESTRUCTOR
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def __init__(self, _oWatcher, _sConfiguration, _bSynchronous, _bBlocking, _fTimeout):
+    def __init__(
+        self, _oWatcher: "Watcher", _sConfiguration: str, _bSynchronous: bool, _bBlocking: bool, _fTimeout: float
+    ):
+        """Constructor.
+
+        Args:
+            _oWatcher: Parent watcher
+            _sConfiguration: Configuration string (URL query string)
+            _bSynchronous: Synchronous flag
+            _bBlocking: Blocking flag
+            _fTimeout: Data feed timeout
         """
-        Constructor.
-
-        @param  Watcher  _oWatcher        Parent watcher
-        @param  string   _sConfiguration  Configuration string (URL query string)
-        @param  bool     _bSynchronous    Synchronous flag
-        @param  bool     _bBlocking       Blocking flag
-        @param  float    _fTimeout        Data feed timeout
-        """
-
         # Parent constructor
         Plugin.__init__(self, _oWatcher, _sConfiguration)
 
@@ -69,26 +64,24 @@ class Producer(Plugin):
 
         # ... co-worker thread
         if not self.__bSynchronous:
-            sThreadName = '%s.Producer' % _oWatcher.name()
+            sThreadName = "%s.Producer" % _oWatcher.name()
             self.__oQueueData = ProducerQueue(1)
             self.__oThreadFeedWatcher = Thread(name=sThreadName, target=self.__feedWatcher)
             self.__oThreadFeedWatcher.start()
 
-
-    #------------------------------------------------------------------------------
+    ############################################################################
     # METHODS
-    #------------------------------------------------------------------------------
+    ############################################################################
 
     def __feedWatcher(self):
-        """
-        Error-reporting wrapper around the parent watcher's feed function.
+        """Error-reporting wrapper around the parent watcher's feed function.
 
         This wrapper detects when the producer is being stuck by a failing
         filters/consumers chain in its parent watcher.
         """
-
         while True:
-            if self._bStop: break
+            if self._bStop:
+                break
             try:
                 sData = self.__oQueueData.get(timeout=1.0)
                 self._oWatcher.feed(sData)
@@ -96,10 +89,8 @@ class Producer(Plugin):
             except Empty:
                 pass
 
-
-    def _feed(self, _sData):
-        """
-        Feed the data to the parent watcher.
+    def _feed(self, _sData: str):
+        """Feed the data to the parent watcher.
 
         Unless the producer is configured as synchronous, this method uses a
         co-worker thread to detect whether the parent watcher gets stuck while
@@ -113,7 +104,6 @@ class Producer(Plugin):
         This method SHOULD be called by a producer as part of its run() business
         (rather than feeding the data directly to the parent watcher).
         """
-
         # Synchronous ?
         if self.__bSynchronous:
             self._oWatcher.feed(_sData)
@@ -125,51 +115,51 @@ class Producer(Plugin):
         if self.__oQueueData.busy():
             if self.__bBlocking:
                 # NB: something is definitely wrong if we get here!...
-                raise Exception('Watcher is still feeding previous data')
+                raise Exception("Watcher is still feeding previous data")
             else:
-                self._oWatcher.log('WARNING[Producer(%s)]: Watcher is still feeding previous data; discarding current data\n' % self._oWatcher.name())
+                self._oWatcher.log(
+                    "WARNING[Producer(%s)]: Watcher is still feeding previous data; discarding current data\n"
+                    % self._oWatcher.name()
+                )
                 return
 
         # ... feed new data
         if self._bDebug:
-            self._oWatcher.log('DEBUG[Producer(%s)]: Feeding data asynchronously\n' % self._oWatcher.name())
+            self._oWatcher.log("DEBUG[Producer(%s)]: Feeding data asynchronously\n" % self._oWatcher.name())
         self.__oQueueData.put(_sData)
 
         # ... wait for the watcher to be done with the data
         while True:
-            if self._bStop: break
+            if self._bStop:
+                break
             try:
                 self.__oQueueData.join(self.__fTimeout)
             except Busy:
                 if self.__bBlocking:
-                    self._oWatcher.log('WARNING[Producer(%s)]: Watcher is still feeding previous data; trying again...\n' % self._oWatcher.name())
+                    self._oWatcher.log(
+                        "WARNING[Producer(%s)]: Watcher is still feeding previous data; trying again...\n"
+                        % self._oWatcher.name()
+                    )
                     continue
             break
 
-
     def stop(self):
-        """
-        Stop the producer and exit gracefully.
-        """
-
+        """Stop the producer and exit gracefully."""
         # Stop
         self._bStop = True
 
-
-    #------------------------------------------------------------------------------
+    ############################################################################
     # METHODS - TO BE OVERRIDDEN
-    #------------------------------------------------------------------------------
+    ############################################################################
 
     def run(self):
-        """
-        Run the producer.
+        """Run the producer.
 
         This method must block until the parent watcher is requested to stop and
         it complies gracefully (watching for self._bStop==True).
 
         The default implementation is to do nothing (exit immediately).
         """
-
         # Run
         # (this is where your actual producer business ought to be implemented)
         pass

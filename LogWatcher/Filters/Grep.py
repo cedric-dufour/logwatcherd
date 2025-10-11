@@ -17,26 +17,20 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# DEPENDENCIES
-#------------------------------------------------------------------------------
-
-# Standard
 import re
 import urllib.parse
+from typing import TYPE_CHECKING
 
-# LogWatcher
-from LogWatcher.Filters import Filter
-from LogWatcher import Data
+from LogWatcher.Data import Data
+from LogWatcher.Filters.Filter import Filter
 
 
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
+if TYPE_CHECKING:
+    from LogWatcher.Watcher import Watcher
+
 
 class Grep(Filter):
-    """
-    Regular-Expression Filter.
+    """Regular-Expression Filter.
 
     This filter tests the provided data against the configured regular expression
     and outputs the data corresponding to the configured group.
@@ -60,55 +54,58 @@ class Grep(Filter):
      - filters = Grep?pattern=authentication failure from (%{ip})&group=1,
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # CONSTRUCTORS / DESTRUCTOR
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def __init__(self, _oWatcher, _sConfiguration):
+    def __init__(self, _oWatcher: "Watcher", _sConfiguration):  # noqa: D107
         # Parent constructor
         Filter.__init__(self, _oWatcher, _sConfiguration)
 
         # Configuration
         dConfiguration = urllib.parse.parse_qs(_sConfiguration, keep_blank_values=True)
-        dConfiguration_keys = dConfiguration.keys()
 
         # ... flags
         iFlags = 0
-        if 'ignorecase' in dConfiguration_keys:
+        if "ignorecase" in dConfiguration:
             iFlags |= re.IGNORECASE
 
         # ... regexp
-        if 'pattern' not in dConfiguration_keys:
-            _oWatcher.log('ERROR[Filter:Grep(%s)]: Missing \'pattern\' configuration parameter\n' % _oWatcher.name())
-            raise RuntimeError('Missing \'pattern\' configuration parameter')
-        sPattern = dConfiguration['pattern'][0]
-        sPattern = sPattern.replace('%{ip}', '([0-9]{1,3}(\.[0-9]{1,3}){3}|[0-9a-f]{1,4}(:[0-9a-f]{0,4}){2,7})') \
-            .replace('%{ipv4}', '[0-9]{1,3}(\.[0-9]{1,3}){3}') \
-            .replace('%{ipv6}', '[0-9a-f]{1,4}(:[0-9a-f]{0,4}){2,7}') \
-            .replace('%{email}', '[-_a-zA-Z0-9]{1,}(\.[-_a-zA-Z0-9]{1,})*@[-_a-zA-Z0-9]{1,}(\.[-_a-zA-Z0-9]{1,})*\.[a-zA-Z]{2,}')
+        if "pattern" not in dConfiguration:
+            _oWatcher.log("ERROR[Filter:Grep(%s)]: Missing 'pattern' configuration parameter\n" % _oWatcher.name())
+            raise RuntimeError("Missing 'pattern' configuration parameter")
+        sPattern = dConfiguration["pattern"][0]
+        sPattern = (
+            sPattern.replace("%{ip}", r"([0-9]{1,3}(\.[0-9]{1,3}){3}|[0-9a-f]{1,4}(:[0-9a-f]{0,4}){2,7})")
+            .replace("%{ipv4}", r"[0-9]{1,3}(\.[0-9]{1,3}){3}")
+            .replace("%{ipv6}", r"[0-9a-f]{1,4}(:[0-9a-f]{0,4}){2,7}")
+            .replace(
+                "%{email}",
+                r"[-_a-zA-Z0-9]{1,}(\.[-_a-zA-Z0-9]{1,})*@[-_a-zA-Z0-9]{1,}(\.[-_a-zA-Z0-9]{1,})*\.[a-zA-Z]{2,}",
+            )
+        )
         try:
             self.__oRegExp = re.compile(sPattern, iFlags)
         except Exception:
-            _oWatcher.log('ERROR[Filter:Grep(%s)]: Invalid \'pattern\' configuration parameter\n' % _oWatcher.name())
+            _oWatcher.log("ERROR[Filter:Grep(%s)]: Invalid 'pattern' configuration parameter\n" % _oWatcher.name())
             raise
 
         # ... group
         self.__iGroup = 0
-        if 'group' in dConfiguration_keys:
+        if "group" in dConfiguration:
             try:
-                self.__iGroup = int(dConfiguration['group'][0])
-                if self.__iGroup<0:
-                    raise ValueError('Value must me greater or equal to zero')
+                self.__iGroup = int(dConfiguration["group"][0])
+                if self.__iGroup < 0:
+                    raise ValueError("Value must me greater or equal to zero")
             except Exception:
-                _oWatcher.log('ERROR[Filter:Grep(%s)]: Invalid \'group\' configuration parameter\n' % _oWatcher.name())
+                _oWatcher.log("ERROR[Filter:Grep(%s)]: Invalid 'group' configuration parameter\n" % _oWatcher.name())
                 raise
 
-
-    #------------------------------------------------------------------------------
+    ############################################################################
     # METHODS
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def feed(self, _sData):
+    def feed(self, _sData: str) -> "Data":  # noqa: D102
         # Test the data against the regular expression
         oMatch = self.__oRegExp.search(_sData)
         if oMatch is None:

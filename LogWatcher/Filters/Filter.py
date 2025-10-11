@@ -17,43 +17,33 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# DEPENDENCIES
-#------------------------------------------------------------------------------
+from LogWatcher.Data import Data
+from LogWatcher.Plugin import Plugin
 
-# LogWatcher
-from LogWatcher import Plugin, Data
-
-
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
 
 class Filter(Plugin):
-    """
-    Log Data Filter.
+    """Log Data Filter.
 
     This class is to be inherited by actual filters and describes the methods
     expected to be overriden.
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # METHODS - TO BE OVERRIDDEN
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def feed(self, _sData):
-        """
-        Filter (raw) data (line) fed by the producer.
+    def feed(self, _sData: str) -> "Data | None":
+        """Filter (raw) data (line) fed by the producer.
 
         If the given data do not match the filter, it must return None.
 
         The default implementation is to pass data through.
 
-        @param  string  _sData  Producer (raw) data (line)
+        Args:
+            _sData: Producer (raw) data (line)
 
-        @return Data  Data object
+        Returns: Data object (or None)
         """
-
         # Data
         # (this is where your actual filter business ought to be implemented)
         return Data(self._oWatcher.name(), _sData, _sData)

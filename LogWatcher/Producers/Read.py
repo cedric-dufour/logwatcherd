@@ -17,25 +17,19 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# DEPENDENCIES
-#------------------------------------------------------------------------------
-
-# Standard
 import time
 import urllib.parse
+from typing import TYPE_CHECKING
 
-# LogWatcher
-from LogWatcher.Producers import Producer
+from LogWatcher.Producers.Producer import Producer
 
 
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
+if TYPE_CHECKING:
+    from LogWatcher.Watcher import Watcher
+
 
 class Read(Producer):
-    """
-    File Reader Producer.
+    """File Reader Producer.
 
     This producer reads the configured file and feeds it to its parent watcher
     line by line.
@@ -52,45 +46,46 @@ class Read(Producer):
      - producer = Read?file=/var/log/syslog&delay=1
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # CONSTRUCTORS / DESTRUCTOR
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def __init__(self, _oWatcher, _sConfiguration, _bSynchronous, _bBlocking, _fTimeout):
+    def __init__(  # noqa: D107
+        self, _oWatcher: "Watcher", _sConfiguration: str, _bSynchronous: bool, _bBlocking: bool, _fTimeout: float
+    ):
         # Parent constructor
         Producer.__init__(self, _oWatcher, _sConfiguration, _bSynchronous, _bBlocking, _fTimeout)
 
         # Configuration
         dConfiguration = urllib.parse.parse_qs(_sConfiguration, keep_blank_values=True)
-        dConfiguration_keys = dConfiguration.keys()
 
         # ... file
-        if 'file' not in dConfiguration_keys:
-            _oWatcher.log('ERROR[Producer:Read(%s)]: Missing \'file\' configuration parameter\n' % _oWatcher.name())
-            raise RuntimeError('Missing \'file\' configuration parameter')
-        self.__sFile = dConfiguration['file'][0]
+        if "file" not in dConfiguration:
+            _oWatcher.log("ERROR[Producer:Read(%s)]: Missing 'file' configuration parameter\n" % _oWatcher.name())
+            raise RuntimeError("Missing 'file' configuration parameter")
+        self.__sFile = dConfiguration["file"][0]
 
         # ... delay
         self.__fDelay = None
-        if 'delay' in dConfiguration_keys:
+        if "delay" in dConfiguration:
             try:
-                self.__fDelay = float(dConfiguration['delay'][0])
-                if self.__fDelay<0.0:
-                    raise ValueError('Value must me greater or equal to zero')
+                self.__fDelay = float(dConfiguration["delay"][0])
+                if self.__fDelay < 0.0:
+                    raise ValueError("Value must me greater or equal to zero")
             except Exception:
-                _oWatcher.log('ERROR[Producer:Read(%s)]: Invalid \'delay\' configuration parameter\n' % _oWatcher.name())
+                _oWatcher.log("ERROR[Producer:Read(%s)]: Invalid 'delay' configuration parameter\n" % _oWatcher.name())
                 raise
 
-
-    #------------------------------------------------------------------------------
+    ############################################################################
     # METHODS
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def run(self):
+    def run(self):  # noqa: D102
         # Feed the file content line-by-line
         with open(self.__sFile) as oFile:
             for sLine in oFile:
-                if self._bStop: break
+                if self._bStop:
+                    break
                 self._feed(sLine.strip())
                 if self.__fDelay is not None:
                     time.sleep(self.__fDelay)

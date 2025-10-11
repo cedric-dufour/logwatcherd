@@ -17,24 +17,19 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# DEPENDENCIES
-#------------------------------------------------------------------------------
-
-# Standard
 import urllib.parse
+from typing import TYPE_CHECKING
 
-# LogWatcher
-from LogWatcher.Consumers import Consumer
+from LogWatcher.Consumers.Consumer import Consumer
 
 
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
+if TYPE_CHECKING:
+    from LogWatcher.Data import Data
+    from LogWatcher.Watcher import Watcher
+
 
 class Write(Consumer):
-    """
-    File Writer Consumer.
+    """File Writer Consumer.
 
     This consumer writes the provided data to the configured file.
 
@@ -55,59 +50,57 @@ class Write(Consumer):
      - consumers = Write?file=/var/log/badauth.log&exclusive,
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # CONSTRUCTORS / DESTRUCTOR
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def __init__(self, _oWatcher, _sConfiguration):
+    def __init__(self, _oWatcher: "Watcher", _sConfiguration):  # noqa: D107
         # Parent constructor
         Consumer.__init__(self, _oWatcher, _sConfiguration)
 
         # Configuration
         dConfiguration = urllib.parse.parse_qs(_sConfiguration, keep_blank_values=True)
-        dConfiguration_keys = dConfiguration.keys()
 
         # ... flags
         self.__bTruncate = False
-        if 'truncate' in dConfiguration_keys:
+        if "truncate" in dConfiguration:
             self.__bTruncate = True
         self.__bExclusive = False
-        if 'exclusive' in dConfiguration_keys:
+        if "exclusive" in dConfiguration:
             self.__bExclusive = True
 
         # ... file
-        if 'file' not in dConfiguration_keys:
-            _oWatcher.log('ERROR[Consumer:Write(%s)]: Missing \'file\' configuration parameter\n' % _oWatcher.name())
-            raise RuntimeError('Missing \'file\' configuration parameter')
-        self.__sFile = dConfiguration['file'][0]
+        if "file" not in dConfiguration:
+            _oWatcher.log("ERROR[Consumer:Write(%s)]: Missing 'file' configuration parameter\n" % _oWatcher.name())
+            raise RuntimeError("Missing 'file' configuration parameter")
+        self.__sFile = dConfiguration["file"][0]
 
         # ... prefix
-        self.__sPrefix = ''
-        if 'prefix' in dConfiguration_keys:
-            self.__sPrefix = dConfiguration['prefix'][0]
+        self.__sPrefix = ""
+        if "prefix" in dConfiguration:
+            self.__sPrefix = dConfiguration["prefix"][0]
 
         # ... suffix
-        self.__sSuffix = ''
-        if 'suffix' in dConfiguration_keys:
-            self.__sSuffix = dConfiguration['suffix'][0]
+        self.__sSuffix = ""
+        if "suffix" in dConfiguration:
+            self.__sSuffix = dConfiguration["suffix"][0]
 
         # File
         self.__oFile = None
         if self.__bExclusive:
-            self.__oFile = open(self.__sFile, 'w' if self.__bTruncate else 'a')
+            self.__oFile = open(self.__sFile, "w" if self.__bTruncate else "a")  # noqa: SIM115
 
-
-    #------------------------------------------------------------------------------
+    ############################################################################
     # METHODS
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def feed(self, _oData):
+    def feed(self, _oData: "Data"):  # noqa: D102
         # Write the data to file
-        sData = '%s%s%s\n' % (self.__sPrefix, _oData.data, self.__sSuffix)
+        sData = "%s%s%s\n" % (self.__sPrefix, _oData.data, self.__sSuffix)
         if self._bDebug:
-            self._oWatcher.log('DEBUG[Consumer:Write(%s)]: Consumed data\n%s' % (self._oWatcher.name(), sData))
+            self._oWatcher.log("DEBUG[Consumer:Write(%s)]: Consumed data\n%s" % (self._oWatcher.name(), sData))
         if self.__oFile is None:
-            with open(self.__sFile, 'w' if self.__bTruncate else 'a') as oFile:
+            with open(self.__sFile, "w" if self.__bTruncate else "a") as oFile:
                 oFile.write(sData)
         else:
             self.__oFile.write(sData)

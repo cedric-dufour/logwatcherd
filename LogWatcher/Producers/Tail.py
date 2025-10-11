@@ -17,26 +17,20 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# DEPENDENCIES
-#------------------------------------------------------------------------------
-
-# Standard
 import os
 import time
 import urllib.parse
+from typing import TYPE_CHECKING
 
-# LogWatcher
-from LogWatcher.Producers import Producer
+from LogWatcher.Producers.Producer import Producer
 
 
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
+if TYPE_CHECKING:
+    from LogWatcher.Watcher import Watcher
+
 
 class Tail(Producer):
-    """
-    File "Tail" Producer (similar to UNIX 'tail -F ...').
+    """File "Tail" Producer (similar to UNIX 'tail -F ...').
 
     This producer watches the configured file and feeds new lines to its parent
     watcher as they appear.
@@ -54,53 +48,59 @@ class Tail(Producer):
      - producer = Tail?file=/var/log/syslog
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # CONSTRUCTORS / DESTRUCTOR
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def __init__(self, _oWatcher, _sConfiguration, _bSynchronous, _bBlocking, _fTimeout):
+    def __init__(  # noqa: D107
+        self, _oWatcher: "Watcher", _sConfiguration: str, _bSynchronous: bool, _bBlocking: bool, _fTimeout: float
+    ):
         # Parent constructor
         Producer.__init__(self, _oWatcher, _sConfiguration, _bSynchronous, _bBlocking, _fTimeout)
 
         # Configuration
         dConfiguration = urllib.parse.parse_qs(_sConfiguration, keep_blank_values=True)
-        dConfiguration_keys = dConfiguration.keys()
 
         # ... file
-        if 'file' not in dConfiguration_keys:
-            _oWatcher.log('ERROR[Producer:Tail(%s)]: Missing \'file\' configuration parameter\n' % _oWatcher.name())
-            raise RuntimeError('Missing \'file\' configuration parameter')
-        self.__sFile = dConfiguration['file'][0]
+        if "file" not in dConfiguration:
+            _oWatcher.log("ERROR[Producer:Tail(%s)]: Missing 'file' configuration parameter\n" % _oWatcher.name())
+            raise RuntimeError("Missing 'file' configuration parameter")
+        self.__sFile = dConfiguration["file"][0]
 
         # ... interval
         self.__fInterval = 1.0
-        if 'interval' in dConfiguration_keys:
+        if "interval" in dConfiguration:
             try:
-                self.__fInterval = float(dConfiguration['interval'][0])
-                if self.__fInterval<=0.0:
-                    raise ValueError('Value must me greater than zero')
+                self.__fInterval = float(dConfiguration["interval"][0])
+                if self.__fInterval <= 0.0:
+                    raise ValueError("Value must me greater than zero")
             except Exception:
-                _oWatcher.log('ERROR[Producer:Tail(%s)]: Invalid \'interval\' configuration parameter\n' % _oWatcher.name())
+                _oWatcher.log(
+                    "ERROR[Producer:Tail(%s)]: Invalid 'interval' configuration parameter\n" % _oWatcher.name()
+                )
                 raise
 
-
-    #------------------------------------------------------------------------------
+    ############################################################################
     # METHODS
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def run(self):
+    def run(self):  # noqa: D102
         # Feed the file content line-by-line
         bStarting = True
         while True:
-            if self._bStop: break
+            if self._bStop:
+                break
 
             # Open file
             try:
-                oFile = open(self.__sFile)
+                oFile = open(self.__sFile)  # noqa: SIM115
                 oStat = os.stat(oFile.name)
-                sFileID = '%s:%s' % (oStat.st_dev, oStat.st_ino) if os.name=='posix' else '%s' % oStat.st_ctime
-            except (IOError, OSError):
-                self._oWatcher.log('WARNING[Producer:Tail(%s)]: Failed to open file (%s); trying again...\n' % (self._oWatcher.name(), self.__sFile))
+                sFileID = "%s:%s" % (oStat.st_dev, oStat.st_ino) if os.name == "posix" else "%s" % oStat.st_ctime
+            except OSError:
+                self._oWatcher.log(
+                    "WARNING[Producer:Tail(%s)]: Failed to open file (%s); trying again...\n"
+                    % (self._oWatcher.name(), self.__sFile)
+                )
                 time.sleep(5.0)
                 continue
 
@@ -112,7 +112,8 @@ class Tail(Producer):
 
                 while True:
                     # Get new lines
-                    if self._bStop: break
+                    if self._bStop:
+                        break
                     iWhere = oFile.tell()
                     lsLines = oFile.readlines()
                     if lsLines:
@@ -127,11 +128,19 @@ class Tail(Producer):
                     # Check file hasn't been replaced (e.g. log rotation)
                     try:
                         oStat = os.stat(oFile.name)
-                        sFileID_check = '%s:%s' % (oStat.st_dev, oStat.st_ino) if os.name=='posix' else '%s' % oStat.st_ctime
+                        sFileID_check = (
+                            "%s:%s" % (oStat.st_dev, oStat.st_ino) if os.name == "posix" else "%s" % oStat.st_ctime
+                        )
                         if sFileID_check != sFileID:
-                            self._oWatcher.log('INFO[Producer:Tail(%s)]: File has been rotated; opening new one\n' % self._oWatcher.name())
+                            self._oWatcher.log(
+                                "INFO[Producer:Tail(%s)]: File has been rotated; opening new one\n"
+                                % self._oWatcher.name()
+                            )
                             break
                     except OSError:
-                        self._oWatcher.log('INFO[Producer:Tail(%s)]: File has vanished; waiting for new one...\n' % self._oWatcher.name())
+                        self._oWatcher.log(
+                            "INFO[Producer:Tail(%s)]: File has vanished; waiting for new one...\n"
+                            % self._oWatcher.name()
+                        )
                         time.sleep(5.0)
                         break

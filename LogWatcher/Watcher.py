@@ -17,29 +17,23 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# DEPENDENCIES
-#------------------------------------------------------------------------------
-
-# Standard
 import os
 import traceback
+from typing import TYPE_CHECKING
 
-# LogWatcher
-from .Data import Data
-from .Producers import Producer
-from .Filters import Filter
 from .Conditioners import Conditioner
 from .Consumers import Consumer
+from .Data import Data
+from .Filters import Filter
+from .Producers import Producer
 
 
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
+if TYPE_CHECKING:
+    from .Daemon import Daemon
+
 
 class Watcher:
-    """
-    Log Watcher.
+    """Log Watcher.
 
     This class/object correspond to a configured log watcher entity and gathers:
      - one producer
@@ -55,20 +49,19 @@ class Watcher:
     Otherwise, the resulting data object is eventually fed to the consumers.
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # CONSTRUCTORS / DESTRUCTOR
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def __init__(self, _oDaemon, _sName, _bVerbose, _bRespawn):
+    def __init__(self, _oDaemon: "Daemon", _sName: str, _bVerbose: bool, _bRespawn: bool):
+        """Constructor.
+
+        Args:
+            _oDameon: Parent daemon
+            _sName: Watcher name
+            _bVerbose: Log output data
+            _bRespawn: Respawn watcher in case of error
         """
-        Constructor.
-
-        @param  Daemon  _oDameon   Parent daemon
-        @param  string  _sName     Watcher name
-        @param  bool    _bVerbose  Log output data
-        @param  bool    _bRespawn  Respawn watcher in case of error
-        """
-
         # Fields
         self.__iPID = os.getpid()
         self.__oDaemon = _oDaemon
@@ -84,99 +77,78 @@ class Watcher:
         self.__bStop = False
         self.__bDebug = _oDaemon.debug()
 
+    def setProducer(self, _oProducer: "Producer"):
+        """Set the data producer.
 
-    def setProducer(self, _oProducer):
+        Args:
+            _oProducer: Log data producer
         """
-        Set the data producer.
-
-        @param  Producer   _oProducer  Log data producer
-        """
-
         if not isinstance(_oProducer, Producer):
-            raise RuntimeError('Producer is not a subclass of LogWatcher.Producers.Producer')
+            raise RuntimeError("Producer is not a subclass of LogWatcher.Producers.Producer")
         self.__oProducer = _oProducer
 
+    def addFilter(self, _oFilter: "Filter"):
+        """Add a data filter.
 
-    def addFilter(self, _oFilter):
+        Args:
+            _oFilter: Log data filter
         """
-        Add a data filter.
-
-        @param  Filter  _oFilter  Log data filter
-        """
-
         if not isinstance(_oFilter, Filter):
-            raise RuntimeError('Filter is not a subclass of LogWatcher.Filters.Filter')
+            raise RuntimeError("Filter is not a subclass of LogWatcher.Filters.Filter")
         self.__bFilter = True
         self.__loFilters.append(_oFilter)
 
+    def addConditioner(self, _oConditioner: "Conditioner"):
+        """Add a data conditioner.
 
-    def addConditioner(self, _oConditioner):
+        Args:
+            _oConditioner: Log data conditioner
         """
-        Add a data conditioner.
-
-        @param  Conditioner  _oConditioner  Log data conditioner
-        """
-
         if not isinstance(_oConditioner, Conditioner):
-            raise RuntimeError('Conditioner is not a subclass of LogWatcher.Conditioners.Conditioner')
+            raise RuntimeError("Conditioner is not a subclass of LogWatcher.Conditioners.Conditioner")
         self.__bConditioner = True
         self.__loConditioners.append(_oConditioner)
 
+    def addConsumer(self, _oConsumer: "Consumer"):
+        """Add a data consumer.
 
-    def addConsumer(self, _oConsumer):
+        Args:
+            _oConsumer: Log data consumer
         """
-        Add a data consumer.
-
-        @param  Consumer  _oConsumer  Log data consumer
-        """
-
         if not isinstance(_oConsumer, Consumer):
-            raise RuntimeError('Consumer is not a subclass of LogWatcher.Consumers.Consumer')
+            raise RuntimeError("Consumer is not a subclass of LogWatcher.Consumers.Consumer")
         self.__loConsumers.append(_oConsumer)
 
-
-    #------------------------------------------------------------------------------
+    ############################################################################
     # METHODS
-    #------------------------------------------------------------------------------
+    ############################################################################
 
     def pid(self):
-        """
-        Return our process ID.
-        """
-
+        """Return our process ID."""
         return self.__iPID
 
-
     def name(self):
-        """
-        Returns the watcher name.
-        """
-
+        """Returns the watcher name."""
         return self.__sName
 
-
     def log(self, sMessage):
-        """
-        Log the given message.
-        """
-
+        """Log the given message."""
         self.__oDaemon.log(sMessage)
 
-
-    def feed(self, _sData):
-        """
-        Feed the producer (raw) data (line) to the watcher.
+    def feed(self, _sData: str):
+        """Feed the producer (raw) data (line) to the watcher.
 
         This method is to be called by the child producer as log data gets generated.
         The data MUST be fed line-by-line, without trailing newline character.
 
-        @param  string  _sData  Log data (line)
+        Args:
+            _sData: Log data (line)
         """
-
         # Stop ?
-        if self.__bStop: return
+        if self.__bStop:
+            return
         if self.__bDebug:
-            self.__oDaemon.log('DEBUG[Watcher(%s)]: Produced data\n%s\n' % (self.__sName, _sData))
+            self.__oDaemon.log("DEBUG[Watcher(%s)]: Produced data\n%s\n" % (self.__sName, _sData))
 
         # Feed the data (string) to the filters (if any)
         oData = None
@@ -185,13 +157,13 @@ class Watcher:
                 try:
                     oData = oFilter.feed(_sData)
                 except Exception as e:
-                    self.__oDaemon.log('ERROR[Watcher(%s)]: Filter error\n%s\n' % (self.__sName, str(e)))
+                    self.__oDaemon.log("ERROR[Watcher(%s)]: Filter error\n%s\n" % (self.__sName, str(e)))
                     if self.__bDebug:
                         traceback.print_exc()
                     if self.__bRespawn:
-                        self.__oDaemon.log('INFO[Watcher(%s)]: Respawning\n' % self.__sName)
+                        self.__oDaemon.log("INFO[Watcher(%s)]: Respawning\n" % self.__sName)
                     else:
-                        self.__oDaemon.log('ERROR[Watcher(%s)]: Exiting\n' % self.__sName)
+                        self.__oDaemon.log("ERROR[Watcher(%s)]: Exiting\n" % self.__sName)
                         self.stop()
                     return
                 if oData is not None:
@@ -201,7 +173,7 @@ class Watcher:
         else:
             oData = Data(self.__sName, _sData, _sData)
         if self.__bDebug:
-            self.__oDaemon.log('DEBUG[Watcher(%s)]: Filtered data\n%s\n' % (self.__sName, oData.data))
+            self.__oDaemon.log("DEBUG[Watcher(%s)]: Filtered data\n%s\n" % (self.__sName, oData.data))
 
         # Feed the data (object) to the conditioners (if any)
         if self.__bConditioner:
@@ -209,84 +181,74 @@ class Watcher:
                 try:
                     oData = oConditioner.feed(oData)
                 except Exception as e:
-                    self.__oDaemon.log('ERROR[Watcher(%s)]: Conditioner error\n%s\n' % (self.__sName, str(e)))
+                    self.__oDaemon.log("ERROR[Watcher(%s)]: Conditioner error\n%s\n" % (self.__sName, str(e)))
                     if self.__bDebug:
                         traceback.print_exc()
                     if self.__bRespawn:
-                        self.__oDaemon.log('INFO[Watcher(%s)]: Respawning\n' % self.__sName)
+                        self.__oDaemon.log("INFO[Watcher(%s)]: Respawning\n" % self.__sName)
                     else:
-                        self.__oDaemon.log('ERROR[Watcher(%s)]: Exiting\n' % self.__sName)
+                        self.__oDaemon.log("ERROR[Watcher(%s)]: Exiting\n" % self.__sName)
                         self.stop()
                     return
                 if oData is None:
                     return
             if self.__bDebug:
-                self.__oDaemon.log('DEBUG[Watcher(%s)]: Conditioned data\n%s\n' % (self.__sName, oData.data))
+                self.__oDaemon.log("DEBUG[Watcher(%s)]: Conditioned data\n%s\n" % (self.__sName, oData.data))
 
         # Feed the data (object) to the consumers
         if self.__bVerbose:
-            self.__oDaemon.log('INFO[Watcher(%s)]: Data: %s\n' % (self.__sName, oData.data))
+            self.__oDaemon.log("INFO[Watcher(%s)]: Data: %s\n" % (self.__sName, oData.data))
         for oConsumer in self.__loConsumers:
             try:
                 oConsumer.feed(oData)
             except Exception as e:
-                self.__oDaemon.log('ERROR[Watcher(%s)]: Consumer error\n%s\n' % (self.__sName, str(e)))
+                self.__oDaemon.log("ERROR[Watcher(%s)]: Consumer error\n%s\n" % (self.__sName, str(e)))
                 if self.__bDebug:
                     traceback.print_exc()
                 if self.__bRespawn:
-                    self.__oDaemon.log('INFO[Watcher(%s)]: Respawning\n' % self.__sName)
+                    self.__oDaemon.log("INFO[Watcher(%s)]: Respawning\n" % self.__sName)
                 else:
-                    self.__oDaemon.log('ERROR[Watcher(%s)]: Exiting\n' % self.__sName)
+                    self.__oDaemon.log("ERROR[Watcher(%s)]: Exiting\n" % self.__sName)
                     self.stop()
                 return
 
-
     def run(self):
-        """
-        Run the watcher.
+        """Run the watcher.
 
         This method will block until the parent daemon is requested to stop and
         the child producer complies.
         """
-
         # Checks
         if self.__oProducer is None:
-            raise RuntimeError('Watcher has no Producer')
+            raise RuntimeError("Watcher has no Producer")
         if not len(self.__loConsumers):
-            raise RuntimeError('Watcher has no Consumer')
+            raise RuntimeError("Watcher has no Consumer")
 
         # Run the producer
         while True:
-            if self.__bStop: break
+            if self.__bStop:
+                break
             try:
                 self.__oProducer.run()
                 if not self.__bStop:
-                    self.__oDaemon.log('ERROR[Watcher(%s)]: Producer terminated without being stopped\n' % self.__sName)
+                    self.__oDaemon.log("ERROR[Watcher(%s)]: Producer terminated without being stopped\n" % self.__sName)
             except Exception as e:
-                self.__oDaemon.log('ERROR[Watcher(%s)]: Producer error\n%s\n' % (self.__sName, str(e)))
+                self.__oDaemon.log("ERROR[Watcher(%s)]: Producer error\n%s\n" % (self.__sName, str(e)))
                 if self.__bDebug:
                     traceback.print_exc()
             if not self.__bStop:
                 if self.__bRespawn:
-                    self.__oDaemon.log('INFO[Watcher(%s)]: Respawning\n' % self.__sName)
+                    self.__oDaemon.log("INFO[Watcher(%s)]: Respawning\n" % self.__sName)
                     continue
                 else:
-                    self.__oDaemon.log('ERROR[Watcher(%s)]: Exiting\n' % self.__sName)
+                    self.__oDaemon.log("ERROR[Watcher(%s)]: Exiting\n" % self.__sName)
             self.stop()
 
-
     def stop(self):
-        """
-        Stop the watcher and exit gracefully.
-        """
-
+        """Stop the watcher and exit gracefully."""
         self.__bStop = True
         self.__oProducer.stop()
 
-
     def debug(self):
-        """
-        Return whether debugging mode is enabled.
-        """
-
+        """Return whether debugging mode is enabled."""
         return self.__bDebug

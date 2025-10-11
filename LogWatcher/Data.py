@@ -17,13 +17,9 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
 
 class Data:
-    """
-    Log Watcher Data.
+    """Log Watcher Data.
 
     This class/object encapsulates log data and metadata, namely:
      - the originating watcher name (self.watcher)
@@ -31,19 +27,18 @@ class Data:
      - the filter (output) data (self.data)
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # CONSTRUCTORS / DESTRUCTOR
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def __init__(self, _sWatcher, _sDataRaw, _sData):
+    def __init__(self, _sWatcher: str, _sDataRaw: str, _sData: str):
+        """Constructor.
+
+        Args:
+            _sWatcher: Originating watcher name
+            _sDataRaw: Producer (raw) data
+            _sData: Filter (output) data
         """
-        Constructor.
-
-        @param  string  _sWatcher  Originating watcher name
-        @param  string  _sDataRaw  Producer (raw) data
-        @param  string  _sData     Filter (output) data
-        """
-
         # Fields
         self.watcher = _sWatcher
         self.data_raw = _sDataRaw

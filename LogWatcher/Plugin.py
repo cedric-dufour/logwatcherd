@@ -17,30 +17,31 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from .Watcher import Watcher
+
 
 class Plugin:
-    """
-    Log Watcher Daemon Plugin base class.
+    """Log Watcher Daemon Plugin base class.
 
     This class acts as the very base class for producers, filters, conditioners
     and consumers.
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # CONSTRUCTORS / DESTRUCTOR
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def __init__(self, _oWatcher, _sConfiguration):
+    def __init__(self, _oWatcher: "Watcher", _sConfiguration: str):
+        """Constructor.
+
+        Args:
+            _oWatcher: Parent watcher
+            _sConfiguration: Configuration string (URL query string)
         """
-        Constructor.
-
-        @param  Watcher  _oWatcher        Parent watcher
-        @param  string   _sConfiguration  Configuration string (URL query string)
-        """
-
         # Fields
         self._oWatcher = _oWatcher
         self._sConfiguration = _sConfiguration

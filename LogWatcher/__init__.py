@@ -17,21 +17,12 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# CONSTANTS
-#------------------------------------------------------------------------------
-
-LOGWATCHER_VERSION = '%{VERSION}'
-LOGWATCHER_CONFIGSPEC = 'logwatcherd.conf.spec'
-
-
-#------------------------------------------------------------------------------
-# DEPENDENCIES
-#------------------------------------------------------------------------------
-
-# LogWatcher
+from .Daemon import Daemon
 from .Data import Data
 from .Logger import Logger
 from .Plugin import Plugin
 from .Watcher import Watcher
-from .Daemon import Daemon
+
+
+LOGWATCHER_VERSION = "%{VERSION}"
+LOGWATCHER_CONFIGSPEC = "logwatcherd.conf.spec"

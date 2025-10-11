@@ -17,39 +17,34 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# DEPENDENCIES
-#------------------------------------------------------------------------------
+from typing import TYPE_CHECKING
 
-# LogWatcher
-from LogWatcher import Plugin
+from LogWatcher.Plugin import Plugin
 
 
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
+if TYPE_CHECKING:
+    from LogWatcher import Data
+
 
 class Consumer(Plugin):
-    """
-    Log Data Consumer.
+    """Log Data Consumer.
 
     This class is to be inherited by actual consumers and describes the methods
     expected to be overriden.
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # METHODS - TO BE OVERRIDDEN
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def feed(self, _oData):
-        """
-        Process data (object) output by the filter.
+    def feed(self, _oData: "Data"):
+        """Process data (object) output by the filter.
 
         The default implementation is to do nothing (exit immediately).
 
-        @param  Data  _oData  Filtered data (object)
+        Args:
+            _oData: Filtered data (object)
         """
-
         # Action
         # (this is where your actual consumer business ought to be implemented)
         pass

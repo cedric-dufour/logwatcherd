@@ -17,44 +17,39 @@
 # See the GNU General Public License for more details.
 #
 
-#------------------------------------------------------------------------------
-# DEPENDENCIES
-#------------------------------------------------------------------------------
+from typing import TYPE_CHECKING
 
-# LogWatcher
-from LogWatcher import Plugin, Data
+from LogWatcher.Plugin import Plugin
 
 
-#------------------------------------------------------------------------------
-# CLASSES
-#------------------------------------------------------------------------------
+if TYPE_CHECKING:
+    from LogWatcher import Data
+
 
 class Conditioner(Plugin):
-    """
-    Log Data Conditioner.
+    """Log Data Conditioner.
 
     This class is to be inherited by actual conditioners and describes the methods
     expected to be overriden.
     """
 
-    #------------------------------------------------------------------------------
+    ############################################################################
     # METHODS - TO BE OVERRIDDEN
-    #------------------------------------------------------------------------------
+    ############################################################################
 
-    def feed(self, _oData):
-        """
-        Condition data (object) output by the filter or a previous conditioner.
+    def feed(self, _oData: "Data") -> "Data | None":
+        """Condition data (object) output by the filter or a previous conditioner.
 
         To interrupt the data processing, a conditioner must return None.
         Otherwise, a conditioner may alter the data object anyway it deems fit.
 
         The default implementation is to pass data through.
 
-        @param  Data  _oData  Filtered or conditioned data object
+        Args:
+            _oData: Filtered or conditioned data object
 
-        @return Data  Data object
+        Returns: Data object (or None)
         """
-
         # Data
         # (this is where your actual conditioner business ought to be implemented)
         return _oData
