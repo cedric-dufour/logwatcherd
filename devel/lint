@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -e -o pipefail
+# shellcheck disable=SC2034
+SCRIPT="${0##*/}"
+SCRIPT_DIR="$(dirname "$(realpath -e "${0}")")"
+
+## Lint
+APP_DIR="$(dirname "${SCRIPT_DIR}")"
+cd "${APP_DIR}"
+
+# Python
+find . -not -path '*/.venv/*' -type f \( -name '*.py' -o -exec sed -n '1,1{/^#!.*python/Q0};Q1' {} \; \) -print0 \
+| sort -z | xargs -r0 isort --settings "${SCRIPT_DIR}/isort.toml"
+find . -not -path '*/.venv/*' -type f \( -name '*.py' -o -exec sed -n '1,1{/^#!.*python/Q0};Q1' {} \; \) -print0 \
+| sort -z | xargs -r0 black --config "${SCRIPT_DIR}/black.toml"
+find . -not -path '*/.venv/*' -type f \( -name '*.py' -o -exec sed -n '1,1{/^#!.*python/Q0};Q1' {} \; \) -print0 \
+| sort -z | xargs -r0 flake8 --config "${SCRIPT_DIR}/flake8.toml"

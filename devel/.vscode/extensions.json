@@ -1,0 +1,14 @@
+{
+    // List or recommende VS Code extensions
+    // REF: https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions
+    "recommendations": [
+        // Python
+        "ms-python.black-formatter",
+        "ms-python.flake8",
+        "ms-python.isort",
+        "ms-python.python",
+        // Shell (& Cie)
+        "foxundermoon.shell-format",
+        "timonwong.shellcheck",
+    ],
+}
