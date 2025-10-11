@@ -32,13 +32,9 @@ import traceback
 import urllib.parse
 
 import configobj
-from daemon import \
-    DaemonContext
-from daemon.runner import \
-    emit_message, \
-    is_pidfile_stale, \
-    make_pidlockfile
 import validate
+from daemon import DaemonContext
+from daemon.pidfile import TimeoutPIDLockFile
 
 from LogWatcher import LOGWATCHER_CONFIGSPEC, LOGWATCHER_VERSION
 
@@ -426,9 +422,14 @@ class Daemon:
         # Daemonize
         try:
             # Create and check PID file
-            oPidLockFile = make_pidlockfile(self.__oArguments.pid, 0)
-            if is_pidfile_stale(oPidLockFile):
-                oPidLockFile.break_lock()
+            oPidLockFile = TimeoutPIDLockFile(self.__oArguments.pid, 0)
+            iPid = oPidLockFile.read_pid()
+            if iPid is not None:
+                try:
+                    os.kill(iPid, signal.SIG_DFL)
+                except ProcessLookupError:
+                    # The specified PID does not exist.
+                    oPidLockFile.break_lock()
             if oPidLockFile.is_locked():
                 sys.stderr.write("ERROR[Daemon]: Daemon process already running; PID=%s\n" % oPidLockFile.read_pid())
                 return errno.EEXIST
@@ -437,10 +438,11 @@ class Daemon:
             oDaemonContext = DaemonContext(pidfile=oPidLockFile)
             oDaemonContext.signal_map = {signal.SIGTERM: self.__signal}
             oDaemonContext.open()
-            emit_message('[%s]' % os.getpid())
+            sys.stderr.write("[%s]\n" % os.getpid())
 
             # Redirect standard error to syslog
-            syslog.openlog('LogWatcher', syslog.LOG_PID, syslog.LOG_DAEMON)
+            sys.stderr.flush()
+            syslog.openlog("LogWatcher", syslog.LOG_PID, syslog.LOG_DAEMON)
             sys.stderr = Logger(self.__syslog)
 
             # Execute
