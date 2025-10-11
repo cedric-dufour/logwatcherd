@@ -20,7 +20,7 @@
 
 import sys
 
-from LogWatcher import Daemon
+from LogWatcher.Daemon import Daemon
 
 
 try:

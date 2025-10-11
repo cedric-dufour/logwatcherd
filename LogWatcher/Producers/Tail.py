@@ -22,11 +22,11 @@ import time
 import urllib.parse
 from typing import TYPE_CHECKING
 
-from LogWatcher.Producers.Producer import Producer
+from .Producer import Producer
 
 
 if TYPE_CHECKING:
-    from LogWatcher.Watcher import Watcher
+    from ..Watcher import Watcher
 
 
 class Tail(Producer):

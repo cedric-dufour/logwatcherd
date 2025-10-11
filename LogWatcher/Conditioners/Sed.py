@@ -21,12 +21,12 @@ import re
 import urllib.parse
 from typing import TYPE_CHECKING
 
-from LogWatcher.Conditioners.Conditioner import Conditioner
-from LogWatcher.Data import Data
+from ..Data import Data
+from .Conditioner import Conditioner
 
 
 if TYPE_CHECKING:
-    from LogWatcher.Watcher import Watcher
+    from ..Watcher import Watcher
 
 
 class Sed(Conditioner):

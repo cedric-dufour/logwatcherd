@@ -19,11 +19,11 @@
 
 from typing import TYPE_CHECKING
 
-from LogWatcher.Plugin import Plugin
+from ..Plugin import Plugin
 
 
 if TYPE_CHECKING:
-    from LogWatcher import Data
+    from ..Data import Data
 
 
 class Consumer(Plugin):

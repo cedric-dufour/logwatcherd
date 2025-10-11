@@ -40,7 +40,10 @@ from daemon.runner import \
     make_pidlockfile
 import validate
 
-from LogWatcher import LOGWATCHER_CONFIGSPEC, LOGWATCHER_VERSION, Logger, Watcher
+from LogWatcher import LOGWATCHER_CONFIGSPEC, LOGWATCHER_VERSION
+
+from .Logger import Logger
+from .Watcher import Watcher
 
 
 class Daemon:

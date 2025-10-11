@@ -21,12 +21,12 @@ import re
 import urllib.parse
 from typing import TYPE_CHECKING
 
-from LogWatcher.Data import Data
-from LogWatcher.Filters.Filter import Filter
+from ..Data import Data
+from .Filter import Filter
 
 
 if TYPE_CHECKING:
-    from LogWatcher.Watcher import Watcher
+    from ..Watcher import Watcher
 
 
 class Grep(Filter):

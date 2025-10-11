@@ -22,12 +22,12 @@ import syslog
 import urllib.parse
 from typing import TYPE_CHECKING
 
-from LogWatcher.Consumers.Consumer import Consumer
+from .Consumer import Consumer
 
 
 if TYPE_CHECKING:
-    from LogWatcher.Data import Data
-    from LogWatcher.Watcher import Watcher
+    from ..Data import Data
+    from ..Watcher import Watcher
 
 
 class Syslog(Consumer):

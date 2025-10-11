@@ -17,8 +17,8 @@
 # See the GNU General Public License for more details.
 #
 
-from LogWatcher.Data import Data
-from LogWatcher.Plugin import Plugin
+from ..Data import Data
+from ..Plugin import Plugin
 
 
 class Filter(Plugin):

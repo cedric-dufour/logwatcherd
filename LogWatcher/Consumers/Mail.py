@@ -25,12 +25,12 @@ from email.mime.text import MIMEText
 from subprocess import PIPE, Popen
 from typing import TYPE_CHECKING
 
-from LogWatcher.Consumers.Consumer import Consumer
+from .Consumer import Consumer
 
 
 if TYPE_CHECKING:
-    from LogWatcher.Data import Data
-    from LogWatcher.Watcher import Watcher
+    from ..Data import Data
+    from ..Watcher import Watcher
 
 
 class Mail(Consumer):

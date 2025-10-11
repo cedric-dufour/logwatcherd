@@ -21,11 +21,11 @@ import os
 import traceback
 from typing import TYPE_CHECKING
 
-from .Conditioners import Conditioner
-from .Consumers import Consumer
+from .Conditioners.Conditioner import Conditioner
+from .Consumers.Consumer import Consumer
 from .Data import Data
-from .Filters import Filter
-from .Producers import Producer
+from .Filters.Filter import Filter
+from .Producers.Producer import Producer
 
 
 if TYPE_CHECKING:

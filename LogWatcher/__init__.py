@@ -17,12 +17,6 @@
 # See the GNU General Public License for more details.
 #
 
-from .Daemon import Daemon
-from .Data import Data
-from .Logger import Logger
-from .Plugin import Plugin
-from .Watcher import Watcher
-
 
 LOGWATCHER_VERSION = "%{VERSION}"
 LOGWATCHER_CONFIGSPEC = "logwatcherd.conf.spec"

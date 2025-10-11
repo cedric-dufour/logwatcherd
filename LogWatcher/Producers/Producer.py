@@ -21,13 +21,12 @@ from queue import Empty
 from threading import Thread
 from typing import TYPE_CHECKING
 
-from LogWatcher.Plugin import Plugin
-
+from ..Plugin import Plugin
 from .ProducerQueue import Busy, ProducerQueue
 
 
 if TYPE_CHECKING:
-    from LogWatcher.Watcher import Watcher
+    from ..Watcher import Watcher
 
 
 class Producer(Plugin):
