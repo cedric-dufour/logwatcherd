@@ -1,0 +1,7 @@
+# Configuration
+# REF: https://pypi.org/project/configobj/
+configobj==5.0.*
+
+# Daemonization
+# REF: https://pypi.org/project/python-daemon/
+python-daemon==3.1.*

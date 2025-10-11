@@ -1,0 +1,11 @@
+# Development
+pip-tools
+
+# Linting
+black
+flake8
+flake8-bugbear
+flake8-builtins
+flake8-docstrings
+flake8-simplify
+isort

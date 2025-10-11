@@ -7,6 +7,9 @@ semantic.cache
 *.pyc
 */__pycache__/
 
+# Ignore Python virtual environment
+/.venv
+
 # Ignore Python packaging directory
 /build
 
@@ -20,4 +23,3 @@ semantic.cache
 /debian/tmp
 /debian/logwatcherd
 /debian/logwatcherd-python3
-
