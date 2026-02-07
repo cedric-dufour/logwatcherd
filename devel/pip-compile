@@ -11,8 +11,8 @@ APP_DIR="$(dirname "${SCRIPT_DIR}")"
 
 # (production)
 [ -e "${APP_DIR}/requirements.txt" ] && rm -i "${APP_DIR}/requirements.txt"
-pip-compile --output-file="${APP_DIR}/requirements.txt" "${APP_DIR}/requirements.in"
+[ ! -e "${APP_DIR}/requirements.txt" ] && pip-compile --output-file="${APP_DIR}/requirements.txt" "${APP_DIR}/requirements.in"
 
 # (development)
-[ -e "${APP_DIR}/dev/requirements.txt" ] && rm -i "${APP_DIR}/dev/requirements.txt"
-pip-compile --output-file="${APP_DIR}/devel/requirements.txt" "${APP_DIR}/devel/requirements.in" "${APP_DIR}/requirements.in"
+[ -e "${APP_DIR}/devel/requirements.txt" ] && rm -i "${APP_DIR}/devel/requirements.txt"
+[ ! -e "${APP_DIR}/devel/requirements.txt" ] && pip-compile --output-file="${APP_DIR}/devel/requirements.txt" "${APP_DIR}/devel/requirements.in" "${APP_DIR}/requirements.in"
