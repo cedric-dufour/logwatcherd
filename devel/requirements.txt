@@ -6,35 +6,31 @@
 #
 attrs==25.4.0
     # via flake8-bugbear
-black==26.1.0
-    # via -r /remote/data/resources/ced-network/devel/system/logwatcherd/devel/requirements.in
+black==26.3.1
+    # via -r requirements.in
 build==1.4.0
     # via pip-tools
 click==8.3.1
     # via
     #   black
     #   pip-tools
-configobj==5.0.9
-    # via -r /remote/data/resources/ced-network/devel/system/logwatcherd/requirements.in
 flake8==7.3.0
     # via
-    #   -r /remote/data/resources/ced-network/devel/system/logwatcherd/devel/requirements.in
+    #   -r requirements.in
     #   flake8-bugbear
     #   flake8-builtins
     #   flake8-docstrings
     #   flake8-simplify
 flake8-bugbear==25.11.29
-    # via -r /remote/data/resources/ced-network/devel/system/logwatcherd/devel/requirements.in
+    # via -r requirements.in
 flake8-builtins==3.1.0
-    # via -r /remote/data/resources/ced-network/devel/system/logwatcherd/devel/requirements.in
+    # via -r requirements.in
 flake8-docstrings==1.7.0
-    # via -r /remote/data/resources/ced-network/devel/system/logwatcherd/devel/requirements.in
+    # via -r requirements.in
 flake8-simplify==0.30.0
-    # via -r /remote/data/resources/ced-network/devel/system/logwatcherd/devel/requirements.in
+    # via -r requirements.in
 isort==7.0.0
-    # via -r /remote/data/resources/ced-network/devel/system/logwatcherd/devel/requirements.in
-lockfile==0.12.2
-    # via python-daemon
+    # via -r requirements.in
 mccabe==0.7.0
     # via flake8
 mypy-extensions==1.1.0
@@ -47,7 +43,7 @@ packaging==26.0
 pathspec==1.0.4
     # via black
 pip-tools==7.5.2
-    # via -r /remote/data/resources/ced-network/devel/system/logwatcherd/devel/requirements.in
+    # via -r requirements.in
 platformdirs==4.5.1
     # via black
 pycodestyle==2.14.0
@@ -60,8 +56,6 @@ pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
-python-daemon==3.1.2
-    # via -r /remote/data/resources/ced-network/devel/system/logwatcherd/requirements.in
 pytokens==0.4.1
     # via black
 snowballstemmer==3.0.1
